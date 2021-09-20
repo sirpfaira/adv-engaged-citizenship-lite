@@ -20,7 +20,7 @@ import AboutIcon from '@mui/icons-material/Info';
 import { useState, useEffect } from 'react';
 import { Link as RouterLink } from 'react-router-dom';
 
-import LOGO_ICON from '../assets/images/home_logo.jpg';
+import LOGO_ICON from '../assets/images/su_100_white.png';
 import HEADERS_DATA from './headers_data';
 import NEWS_ICON from '../assets/images/news.png';
 import REGISTER_ICON from '../assets/images/sign_up.png';
@@ -39,7 +39,7 @@ function Header({ aunthenticated, user }) {
 
   useEffect(() => {
     const setResponsiveness = () => {
-      return window.innerWidth < 700
+      return window.innerWidth < 900
         ? setState((prevState) => ({ ...prevState, mobileView: true }))
         : setState((prevState) => ({ ...prevState, mobileView: false }));
     };
@@ -57,9 +57,11 @@ function Header({ aunthenticated, user }) {
     return (
       <Toolbar
         sx={{
-          display: flexbox,
+          display: 'flex',
           flexDirection: 'row',
           justifyContent: 'space-between',
+          alignItems: 'center',
+          maxWidth: '100%',
         }}
       >
         <LogoImage />
@@ -108,30 +110,39 @@ function Header({ aunthenticated, user }) {
           justifyContent: 'space-between',
         }}
       >
-        <IconButton
-          {...{
-            edge: 'start',
-            color: 'inherit',
-            'aria-label': 'menu',
-            'aria-haspopup': 'true',
-            onClick: handleDrawerOpen,
+        <Box
+          sx={{
+            display: 'flex',
+            flexDirection: 'row',
+            justifyContent: 'space-between',
           }}
         >
-          <MenuIcon />
-        </IconButton>
+          <IconButton
+            {...{
+              edge: 'start',
+              color: 'inherit',
+              'aria-label': 'menu',
+              'aria-haspopup': 'true',
+              onClick: handleDrawerOpen,
+            }}
+          >
+            <MenuIcon />
+          </IconButton>
 
-        <Drawer
-          {...{
-            anchor: 'left',
-            open: drawerOpen,
-            onClose: handleDrawerClose,
-          }}
-        >
-          <MobileMenuItems />
-        </Drawer>
+          <Drawer
+            {...{
+              anchor: 'left',
+              open: drawerOpen,
+              onClose: handleDrawerClose,
+            }}
+          >
+            <MobileMenuItems />
+          </Drawer>
 
-        <LogoImage />
-        <PageTitle />
+          <LogoImage />
+        </Box>
+        {/* <PageTitle />*/}
+
         <Box
           sx={{
             bgcolor: 'primary.light',
@@ -253,7 +264,7 @@ function Header({ aunthenticated, user }) {
 
   const PageTitle = () => {
     return (
-      <Box sx={{ marginLeft: '1rem', marginRight: '1rem' }}>
+      <Box sx={{ marginLeft: '1rem', marginRight: '1rem', flexGrow: 1 }}>
         <Typography>Advancing Engaged Citizenship</Typography>
       </Box>
     );
@@ -301,7 +312,12 @@ function Header({ aunthenticated, user }) {
 
   const LogoImage = () => {
     return (
-      <Box sx={{ marginLeft: '1rem', marginRight: '1rem' }}>
+      <Box
+        sx={{
+          margin: '1rem',
+          padding: '0.2rem',
+        }}
+      >
         <img src={LOGO_ICON} alt='Website Logo' height='45rem' width='auto' />
       </Box>
     );
@@ -326,8 +342,7 @@ const Nav = styled.nav`
   top: 0;
   left: 0;
   right: 0;
-
-  overflow-x: hidden;
+  max-width: 100wh;
   padding: 0 36px;
 `;
 

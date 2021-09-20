@@ -1,6 +1,8 @@
 import * as React from 'react';
-import {Grid, Box, Typography, Container, Link} from '@mui/material';
-import FOOTER_ICON from '../../assets/images/su_centenial_logo.png';
+import { Box, Typography, Link } from '@mui/material';
+import styled from 'styled-components';
+import FOOTER_ICON from '../../assets/images/su_100_long.png';
+import theme from '../../themes/theme';
 
 function Copyright() {
   return (
@@ -17,24 +19,56 @@ function Copyright() {
   );
 }
 
-export default function Footer() {
+const Footer = () => {
   return (
-    <Box component='footer' sx={{height: '4rem', display: "flex", flexDirection: "row"}}>
-      <Grid container spacing={2} sx={{
-            backgroundColor: (theme) => theme.palette.grey[200],
-          }}>
-        
-          <Grid item xs={12} md={6} sx={{ marginLeft: '1rem', marginRight: '1rem', flexGrow: 1 }}>
-            <img src={FOOTER_ICON} alt='Footer' height='100%' width='auto' />
-          </Grid>
-          <Grid item xs={12} md={6} sx={{flexGrow: 1}}>
-          <Box sx={{display: "flex", flexDirection: "column"}}>
-            <Typography variant='body1'>Advancing Engaged Citizenship</Typography>
-            <Copyright />
-            </Box>
-          </Grid>
-        
-      </Grid>
-    </Box>
+    <Container>
+      <FlexItem>
+        <ImageContainer>
+          <Image src={FOOTER_ICON} alt='Footer' height='100%' width='auto' />
+        </ImageContainer>
+      </FlexItem>
+      <FlexItem>
+        <Box
+          sx={{
+            display: 'flex',
+            flexDirection: 'column',
+            alignItems: 'center',
+          }}
+        >
+          <Typography variant='h5'>Advancing Engaged Citizenship</Typography>
+          <Typography variant='body2'>
+            204521, Zoom St, Cape Town, South Africa
+          </Typography>
+          <Copyright />
+        </Box>
+      </FlexItem>
+    </Container>
   );
-}
+};
+
+export default Footer;
+
+const Container = styled.div`
+  display: flex;
+  flex-direction: row};
+  align-items: center;
+  justify-content: center;
+  padding: 1rem;
+  background-color: ${theme.palette.primary.white};
+
+  @media (max-width: 768px) {
+    flex-direction: column;
+  }
+`;
+
+const FlexItem = styled.div`
+  margin-left: 1rem;
+  margin-right: 1rem;
+  flex-grow: 1;
+`;
+
+const ImageContainer = styled.div`
+  width: 40%;
+`;
+
+const Image = styled.img``;
