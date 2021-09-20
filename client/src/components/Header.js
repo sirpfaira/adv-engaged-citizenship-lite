@@ -17,6 +17,7 @@ import {
 } from '@mui/material';
 import MenuIcon from '@mui/icons-material/Menu';
 import AboutIcon from '@mui/icons-material/Info';
+import AccountCircle from '@mui/icons-material/AccountCircle';
 import { useState, useEffect } from 'react';
 import { Link as RouterLink } from 'react-router-dom';
 
@@ -26,10 +27,17 @@ import NEWS_ICON from '../assets/images/news.png';
 import REGISTER_ICON from '../assets/images/sign_up.png';
 import EVENTS_ICON from '../assets/images/events.png';
 import PROJECTS_ICON from '../assets/images/projects.png';
-import LOGIN_ICON from '../assets/images/log_in.png';
+import COMPETITIONS_ICON from '../assets/images/trophy.png';
 import LogInButton from './LogInButton';
 
-function Header({ aunthenticated, user }) {
+//function Header({ aunthentication, changeAuthentication }) {
+function Header() {
+  const authentication = {
+    auth: true,
+    type: 'student',
+    userName: 'Simba',
+    userId: 'S1234',
+  };
   const [state, setState] = useState({
     mobileView: false,
     drawerOpen: false,
@@ -67,32 +75,50 @@ function Header({ aunthenticated, user }) {
         <LogoImage />
         <PageTitle />
         <DesktopMenuItems />
-        <Box
-          sx={{
-            bgcolor: 'primary.light',
-            marginRight: '1rem',
-            marginLeft: '0px',
-            borderRadius: '4px',
-            display: 'flex',
-            flexDirection: 'row',
-            padding: '0.2rem',
-            justifyContent: 'center',
-            alignItems: 'center',
-            color: 'text.secondary',
-          }}
-        >
-          <Box
-            component='img'
-            sx={{
-              height: '1.2rem',
-              marginLeft: '0.3rem',
-            }}
-            src={LOGIN_ICON}
-            alt='projects'
-          ></Box>
-          <LogInButton />
-        </Box>
+        <LogInButton user={authentication} />
       </Toolbar>
+    );
+  };
+
+  const DesktopMenuItems = () => {
+    let DISPLAY_DATA = getHeadersData();
+
+    return (
+      <Stack
+        spacing={2}
+        direction={{ xs: 'column', sm: 'row' }}
+        sx={{
+          marginLeft: '1rem',
+          marginRight: '1rem',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          textAlign: 'center',
+        }}
+        divider={
+          <Divider
+            orientation='vertical'
+            flexItem
+            border-color='primary.grey'
+          />
+        }
+      >
+        {DISPLAY_DATA.map(({ label, href }) => (
+          <Box key={label}>
+            <Button
+              style={{ textTransform: 'none' }}
+              {...{
+                key: label,
+                color: 'inherit',
+                to: href,
+                component: RouterLink,
+              }}
+            >
+              {label}
+            </Button>
+          </Box>
+        ))}
+      </Stack>
     );
   };
 
@@ -142,33 +168,13 @@ function Header({ aunthenticated, user }) {
           <LogoImage />
         </Box>
         {/* <PageTitle />*/}
-
-        <Box
-          sx={{
-            bgcolor: 'primary.light',
-            marginRight: '1rem',
-            marginLeft: '0px',
-            borderRadius: '4px',
-            display: 'flex',
-            flexDirection: 'row',
-            padding: '0.2rem',
-            justifyContent: 'center',
-            alignItems: 'center',
-          }}
-        >
-          <Box
-            component='img'
-            sx={{ height: '1.2rem', marginLeft: '0.3rem' }}
-            src={LOGIN_ICON}
-            alt='login'
-          ></Box>
-          <LogInButton />
-        </Box>
+        <LogInButton user={authentication} />
       </Toolbar>
     );
   };
 
   const MobileMenuItems = () => {
+    let DISPLAY_DATA = getHeadersData();
     return (
       <Stack sx={{ marginTop: '1rem' }}>
         <Typography
@@ -182,7 +188,7 @@ function Header({ aunthenticated, user }) {
         >
           Menu
         </Typography>
-        {HEADERS_DATA.map(({ label, href, id }) => (
+        {DISPLAY_DATA.map(({ label, href, id }) => (
           <Box key={label}>
             <Link
               {...{
@@ -215,6 +221,16 @@ function Header({ aunthenticated, user }) {
         ))}
       </Stack>
     );
+  };
+
+  const getHeadersData = () => {
+    if (authentication.auth && authentication.type === 'student') {
+      return HEADERS_DATA.student;
+    } else if (authentication.auth && authentication.type === 'advisor') {
+      return HEADERS_DATA.advisor;
+    } else {
+      return HEADERS_DATA.home;
+    }
   };
 
   const GetMenuIcon = ({ id }) => {
@@ -257,6 +273,17 @@ function Header({ aunthenticated, user }) {
         );
       case 5:
         return <AboutIcon />;
+      case 6:
+        return <AccountCircle />;
+      case 7:
+        return (
+          <Box
+            component='img'
+            sx={{ height: '1.3rem' }}
+            src={COMPETITIONS_ICON}
+            alt='register'
+          ></Box>
+        );
       default:
         return <MenuIcon />;
     }
@@ -265,48 +292,10 @@ function Header({ aunthenticated, user }) {
   const PageTitle = () => {
     return (
       <Box sx={{ marginLeft: '1rem', marginRight: '1rem', flexGrow: 1 }}>
-        <Typography>Advancing Engaged Citizenship</Typography>
+        <Typography sx={{ textAlign: 'center', fontSize: '1rem' }}>
+          {authentication.auth ? '' : 'Advancing Engaged Citizenship'}
+        </Typography>
       </Box>
-    );
-  };
-
-  const DesktopMenuItems = () => {
-    return (
-      <Stack
-        spacing={2}
-        direction={{ xs: 'column', sm: 'row' }}
-        sx={{
-          marginLeft: '1rem',
-          marginRight: '1rem',
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-          textAlign: 'center',
-        }}
-        divider={
-          <Divider
-            orientation='vertical'
-            flexItem
-            border-color='primary.grey'
-          />
-        }
-      >
-        {HEADERS_DATA.map(({ label, href }) => (
-          <Box key={label}>
-            <Button
-              style={{ textTransform: 'none' }}
-              {...{
-                key: label,
-                color: 'inherit',
-                to: href,
-                component: RouterLink,
-              }}
-            >
-              {label}
-            </Button>
-          </Box>
-        ))}
-      </Stack>
     );
   };
 

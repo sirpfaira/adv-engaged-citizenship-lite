@@ -60,8 +60,11 @@ const Content = () => {
                   and mentorship via the platform.
                 </Typography>
                 <Join>
-                  <Button variant='contained' sx={{ margin: '0.7rem' }}>
-                    Join Now
+                  <Button
+                    variant='contained'
+                    sx={{ margin: '0.7rem', textTransform: 'none' }}
+                  >
+                    {`Join Now >>>`}
                   </Button>
                 </Join>
               </Box>
@@ -108,5 +111,4 @@ const Join = styled.div`
   flex-direction: row;
   justify-content: end;
   width: 100%;
-  backgroundcolor: #f00;
 `;
