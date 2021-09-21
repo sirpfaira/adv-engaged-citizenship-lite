@@ -11,10 +11,20 @@ const theme = createTheme({
       yellow: '#b9b013',
       green: '#01484e',
       light: '#fff',
+      error: '#f00',
+      contrastText: '#fff',
+      frosting_cream: '#fffbee',
+    },
+    secondary: {
+      main: '#9c27b0',
+      contrastText: '#fff',
     },
     text: {
       primary: '#60223b',
-      secondary: '#fff',
+      secondary: '#60223b',
+    },
+    background: {
+      paper: '#fff',
     },
   },
   breakpoints: {

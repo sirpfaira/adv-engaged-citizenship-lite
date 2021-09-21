@@ -13,15 +13,17 @@ import {
 	CardMedia,*/
 } from '@mui/material';
 import styled from 'styled-components';
+import { useHistory } from 'react-router-dom';
 import ProjectCard from './ProjectCard';
 import PROJECTS from '../../assets/data/projects.json';
 import BG from '../../assets/images/bg.jpg';
 import Testimonials from './Testimonials';
 import Team from './Team';
 import HOME_PAGE_DATA from '../../assets/data/homePageData.json';
-import theme from '../../themes/theme';
+//import theme from '../../themes/theme';
 
-const Content = () => {
+const Content = (props) => {
+  let history = useHistory();
   return (
     <Container
       sx={{
@@ -52,7 +54,7 @@ const Content = () => {
                 }}
               >
                 <Typography>
-                  A platform where students can journey with a team of advisors
+                  A platform where students can journey with a team of mentors
                   to assist with the innovation of project ideas, during the
                   conceptualization and implementation phase. It allows students
                   to complete a standard template with prompts to answer key
@@ -63,6 +65,7 @@ const Content = () => {
                   <Button
                     variant='contained'
                     sx={{ margin: '0.7rem', textTransform: 'none' }}
+                    onClick={() => history.push('/register')}
                   >
                     {`Join Now >>>`}
                   </Button>

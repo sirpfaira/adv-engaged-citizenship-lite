@@ -28,6 +28,11 @@ const headersData = {
   ],
   student: [
     {
+      label: 'Dashboard',
+      href: '/dashboard',
+      id: 8,
+    },
+    {
       label: 'Profile',
       href: '/myprofile',
       id: 6,
@@ -48,7 +53,7 @@ const headersData = {
       id: 7,
     },
   ],
-  advisor: [
+  mentor: [
     {
       label: 'My Projects',
       href: '/myprojects',

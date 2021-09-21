@@ -8,14 +8,21 @@ import { withRouter } from 'react-router-dom';
 import { Box } from '@mui/material';
 import LOGIN_ICON from '../assets/images/log_in.png';
 import LOGOUT_ICON from '../assets/images/log_out.png';
+import { withSnackbar } from 'notistack';
 
 function LOgInButton(props) {
-  console.log(props);
+  // console.log(props);
   const [anchorEl, setAnchorEl] = React.useState(null);
   const open = Boolean(anchorEl);
   const handleClick = (event) => {
     if (props.user.auth) {
-      props.history.push('/home');
+      props.enqueueSnackbar('You have been logged out!', { variant: 'error' });
+      props.changeUser({
+        auth: false,
+        type: '',
+        userId: '',
+      });
+      props.history.push('/');
     } else {
       setAnchorEl(event.currentTarget);
     }
@@ -74,7 +81,15 @@ function LOgInButton(props) {
         TransitionComponent={Fade}
       >
         <MenuItem
-          onClick={() => props.history.push('/student/login')}
+          onClick={() => {
+            props.history.push('/login?student');
+            handleClose();
+            /*props.changeUser({
+              auth: true,
+              type: 'student',
+              userId: 'S1234',
+            });*/
+          }}
           sx={{ color: 'primary.main' }}
         >
           <Avatar
@@ -87,7 +102,10 @@ function LOgInButton(props) {
           Student
         </MenuItem>
         <MenuItem
-          onClick={() => props.history.push('/mentor/login')}
+          onClick={() => {
+            props.history.push('/login?mentor');
+            handleClose();
+          }}
           sx={{ color: 'primary.main' }}
         >
           <Avatar
@@ -97,11 +115,27 @@ function LOgInButton(props) {
               marginRight: '0.3rem',
             }}
           />{' '}
-          Advisor
+          Mentor
+        </MenuItem>
+        <MenuItem
+          onClick={() => {
+            props.history.push('/login?admin');
+            handleClose();
+          }}
+          sx={{ color: 'primary.main' }}
+        >
+          <Avatar
+            sx={{
+              color: 'primary.main',
+              bgcolor: 'primary.light',
+              marginRight: '0.3rem',
+            }}
+          />{' '}
+          Admin
         </MenuItem>
       </Menu>
     </Box>
   );
 }
 
-export default withRouter(LOgInButton);
+export default withRouter(withSnackbar(LOgInButton));

@@ -1,4 +1,4 @@
-import React from 'react';
+import * as React from 'react';
 import styled from 'styled-components';
 import theme from '../themes/theme';
 import { flexbox } from '@mui/system';
@@ -20,24 +20,21 @@ import AboutIcon from '@mui/icons-material/Info';
 import AccountCircle from '@mui/icons-material/AccountCircle';
 import { useState, useEffect } from 'react';
 import { Link as RouterLink } from 'react-router-dom';
+import { useHistory } from 'react-router-dom';
 
 import LOGO_ICON from '../assets/images/su_100_white.png';
 import HEADERS_DATA from './headers_data';
 import NEWS_ICON from '../assets/images/news.png';
 import REGISTER_ICON from '../assets/images/sign_up.png';
 import EVENTS_ICON from '../assets/images/events.png';
+import DASHBOARD_ICON from '../assets/images/dashboard.png';
 import PROJECTS_ICON from '../assets/images/projects.png';
 import COMPETITIONS_ICON from '../assets/images/trophy.png';
 import LogInButton from './LogInButton';
+import UserNotifications from './UserNotifications';
 
-//function Header({ aunthentication, changeAuthentication }) {
-function Header() {
-  const authentication = {
-    auth: true,
-    type: 'student',
-    userName: 'Simba',
-    userId: 'S1234',
-  };
+function Header(props) {
+  let history = useHistory();
   const [state, setState] = useState({
     mobileView: false,
     drawerOpen: false,
@@ -75,7 +72,13 @@ function Header() {
         <LogoImage />
         <PageTitle />
         <DesktopMenuItems />
-        <LogInButton user={authentication} />
+        <MainMenuIcons
+          {...props}
+          notifications={props.notifications}
+          changeNotifications={props.changeNotifications}
+          user={props.user}
+          changeUser={props.changeUser}
+        />
       </Toolbar>
     );
   };
@@ -168,8 +171,38 @@ function Header() {
           <LogoImage />
         </Box>
         {/* <PageTitle />*/}
-        <LogInButton user={authentication} />
+        <MainMenuIcons
+          notifications={props.notifications}
+          changeNotifications={props.changeNotifications}
+          user={props.user}
+          changeUser={props.changeUser}
+        />
       </Toolbar>
+    );
+  };
+
+  const MainMenuIcons = (props) => {
+    return (
+      <Box
+        sx={{
+          display: 'flex',
+          flexDirection: 'row',
+          justifyContent: 'space-between',
+          alignItems: 'center',
+        }}
+      >
+        {props.user.auth ? (
+          <Box sx={{ marginRight: '1.5rem', marginTop: '0.5rem' }}>
+            <UserNotifications
+              notifications={props.notifications}
+              changeNotifications={props.changeNotifications}
+            />
+          </Box>
+        ) : (
+          ''
+        )}
+        <LogInButton user={props.user} changeUser={props.changeUser} />
+      </Box>
     );
   };
 
@@ -224,10 +257,10 @@ function Header() {
   };
 
   const getHeadersData = () => {
-    if (authentication.auth && authentication.type === 'student') {
+    if (props.user.auth && props.user.type === 'student') {
       return HEADERS_DATA.student;
-    } else if (authentication.auth && authentication.type === 'advisor') {
-      return HEADERS_DATA.advisor;
+    } else if (props.user.auth && props.user.type === 'mentor') {
+      return HEADERS_DATA.mentor;
     } else {
       return HEADERS_DATA.home;
     }
@@ -281,7 +314,16 @@ function Header() {
             component='img'
             sx={{ height: '1.3rem' }}
             src={COMPETITIONS_ICON}
-            alt='register'
+            alt='competitions'
+          ></Box>
+        );
+      case 8:
+        return (
+          <Box
+            component='img'
+            sx={{ height: '1.3rem' }}
+            src={DASHBOARD_ICON}
+            alt='dashboard'
           ></Box>
         );
       default:
@@ -293,7 +335,7 @@ function Header() {
     return (
       <Box sx={{ marginLeft: '1rem', marginRight: '1rem', flexGrow: 1 }}>
         <Typography sx={{ textAlign: 'center', fontSize: '1rem' }}>
-          {authentication.auth ? '' : 'Advancing Engaged Citizenship'}
+          {props.user.auth ? '' : 'Advancing Engaged Citizenship'}
         </Typography>
       </Box>
     );
@@ -306,8 +348,9 @@ function Header() {
           margin: '1rem',
           padding: '0.2rem',
         }}
+        onClick={() => history.push('/')}
       >
-        <img src={LOGO_ICON} alt='Website Logo' height='45rem' width='auto' />
+        <img src={LOGO_ICON} alt='Website Logo' height='30rem' width='auto' />
       </Box>
     );
   };
