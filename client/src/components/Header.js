@@ -1,6 +1,5 @@
 import * as React from 'react';
 import styled from 'styled-components';
-import theme from '../themes/theme';
 import { flexbox } from '@mui/system';
 import {
   AppBar,
@@ -18,20 +17,13 @@ import {
 import MenuIcon from '@mui/icons-material/Menu';
 import AboutIcon from '@mui/icons-material/Info';
 import AccountCircle from '@mui/icons-material/AccountCircle';
+import PortalIcon from '@mui/icons-material/Group';
 import { useState, useEffect } from 'react';
 import { Link as RouterLink } from 'react-router-dom';
 import { useHistory } from 'react-router-dom';
-
-import LOGO_ICON from '../assets/images/su_100_white.png';
-import HEADERS_DATA from './headers_data';
-import NEWS_ICON from '../assets/images/news.png';
-import REGISTER_ICON from '../assets/images/sign_up.png';
-import EVENTS_ICON from '../assets/images/events.png';
-import DASHBOARD_ICON from '../assets/images/dashboard.png';
-import PROJECTS_ICON from '../assets/images/projects.png';
-import COMPETITIONS_ICON from '../assets/images/trophy.png';
 import LogInButton from './LogInButton';
 import UserNotifications from './UserNotifications';
+//import theme from '../themes/theme';
 
 function Header(props) {
   let history = useHistory();
@@ -176,6 +168,7 @@ function Header(props) {
           changeNotifications={props.changeNotifications}
           user={props.user}
           changeUser={props.changeUser}
+          changeHeaders={props.changeHeaders}
         />
       </Toolbar>
     );
@@ -201,7 +194,11 @@ function Header(props) {
         ) : (
           ''
         )}
-        <LogInButton user={props.user} changeUser={props.changeUser} />
+        <LogInButton
+          user={props.user}
+          changeUser={props.changeUser}
+          changeHeaders={props.changeHeaders}
+        />
       </Box>
     );
   };
@@ -257,13 +254,14 @@ function Header(props) {
   };
 
   const getHeadersData = () => {
-    if (props.user.auth && props.user.type === 'student') {
+    /*if (props.user.auth && props.user.type === 'student') {
       return HEADERS_DATA.student;
     } else if (props.user.auth && props.user.type === 'mentor') {
       return HEADERS_DATA.mentor;
     } else {
       return HEADERS_DATA.home;
-    }
+    }*/
+    return props.headers;
   };
 
   const GetMenuIcon = ({ id }) => {
@@ -272,8 +270,8 @@ function Header(props) {
         return (
           <Box
             component='img'
+            src='/images/navbar/projects.png'
             sx={{ height: '1.2rem' }}
-            src={PROJECTS_ICON}
             alt='projects'
           ></Box>
         );
@@ -282,7 +280,7 @@ function Header(props) {
           <Box
             component='img'
             sx={{ height: '1.2rem' }}
-            src={NEWS_ICON}
+            src='/images/navbar/news.png'
             alt='news'
           ></Box>
         );
@@ -291,7 +289,7 @@ function Header(props) {
           <Box
             component='img'
             sx={{ height: '1.2rem' }}
-            src={EVENTS_ICON}
+            src='/images/navbar/events.png'
             alt='events'
           ></Box>
         );
@@ -300,7 +298,7 @@ function Header(props) {
           <Box
             component='img'
             sx={{ height: '1.3rem' }}
-            src={REGISTER_ICON}
+            src='/images/navbar/sign_up.png'
             alt='register'
           ></Box>
         );
@@ -313,7 +311,7 @@ function Header(props) {
           <Box
             component='img'
             sx={{ height: '1.3rem' }}
-            src={COMPETITIONS_ICON}
+            src='/images/navbar/trophy.png'
             alt='competitions'
           ></Box>
         );
@@ -322,10 +320,12 @@ function Header(props) {
           <Box
             component='img'
             sx={{ height: '1.3rem' }}
-            src={DASHBOARD_ICON}
+            src='/images/navbar/dashboard.png'
             alt='dashboard'
           ></Box>
         );
+      case 9:
+        return <PortalIcon />;
       default:
         return <MenuIcon />;
     }
@@ -350,7 +350,12 @@ function Header(props) {
         }}
         onClick={() => history.push('/')}
       >
-        <img src={LOGO_ICON} alt='Website Logo' height='30rem' width='auto' />
+        <img
+          src='/images/navbar/logo.png'
+          alt='Website Logo'
+          height='30rem'
+          width='auto'
+        />
       </Box>
     );
   };

@@ -7,6 +7,8 @@ import Dashboard from './pages/dashboard/Dashboard';
 import AllNotifications from './pages/dashboard/AllNotifications';
 import Profile from './pages/dashboard/Profile';
 import EditProfile from './pages/dashboard/EditProfile';
+import HEADERS_DATA from './components/headers_data';
+import ImageUpload from './pages/dashboard/ImageUpload';
 
 function App(props) {
   const [user, setUser] = useState({
@@ -15,7 +17,8 @@ function App(props) {
     userId: '',
   });
 
-  const [notifications, setNotifications] = useState(3);
+  const [notifications, setNotifications] = useState(0);
+  const [headers, setHeaders] = useState(HEADERS_DATA.home);
 
   const changeNotifications = (count) => {
     setNotifications(count);
@@ -23,6 +26,10 @@ function App(props) {
 
   const changeUser = (currentUser) => {
     setUser(currentUser);
+  };
+
+  const changeHeaders = (currentHeaders) => {
+    setHeaders(currentHeaders);
   };
 
   return (
@@ -33,17 +40,30 @@ function App(props) {
           changeUser={changeUser}
           notifications={notifications}
           changeNotifications={changeNotifications}
+          headers={headers}
+          changeHeaders={changeHeaders}
         />
         <Switch>
           <Route
             path='/login'
-            render={(props) => <LogIn {...props} changeUser={changeUser} />}
+            render={(props) => (
+              <LogIn
+                {...props}
+                user={user}
+                changeUser={changeUser}
+                changeHeaders={changeHeaders}
+              />
+            )}
           />
           <Route
             path='/dashboard'
             render={(props) =>
               user.auth ? (
-                <Dashboard {...props} user={user} />
+                <Dashboard
+                  {...props}
+                  user={user}
+                  changeNotifications={changeNotifications}
+                />
               ) : (
                 <Redirect to='/login' />
               )
@@ -79,7 +99,18 @@ function App(props) {
               )
             }
           />
-          <Route path='/*' render={(props) => <Home {...props} />} />
+          <Route path='/upload' render={(props) => <ImageUpload />} />
+          <Route
+            path='/*'
+            render={(props) => (
+              <Home
+                {...props}
+                changeUser={changeUser}
+                changeNotifications={changeNotifications}
+                changeHeaders={changeHeaders}
+              />
+            )}
+          />
         </Switch>
       </BrowserRouter>
     </>

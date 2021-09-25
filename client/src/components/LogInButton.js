@@ -1,16 +1,15 @@
-import * as React from 'react';
-import Button from '@mui/material/Button';
+import React from 'react';
+import { Button, Typography } from '@mui/material';
 import Menu from '@mui/material/Menu';
 import MenuItem from '@mui/material/MenuItem';
 import Avatar from '@mui/material/Avatar';
 import Fade from '@mui/material/Fade';
 import { withRouter } from 'react-router-dom';
 import { Box } from '@mui/material';
-import LOGIN_ICON from '../assets/images/log_in.png';
-import LOGOUT_ICON from '../assets/images/log_out.png';
 import { withSnackbar } from 'notistack';
+import HEADERS_DATA from '../components/headers_data';
 
-function LOgInButton(props) {
+function LogInButton(props) {
   // console.log(props);
   const [anchorEl, setAnchorEl] = React.useState(null);
   const open = Boolean(anchorEl);
@@ -22,6 +21,7 @@ function LOgInButton(props) {
         type: '',
         userId: '',
       });
+      props.changeHeaders(HEADERS_DATA.home);
       props.history.push('/');
     } else {
       setAnchorEl(event.currentTarget);
@@ -54,7 +54,11 @@ function LOgInButton(props) {
             height: '1.2rem',
             marginLeft: '0.3rem',
           }}
-          src={props.user.auth ? LOGOUT_ICON : LOGIN_ICON}
+          src={
+            props.user.auth
+              ? 'images/navbar/log_out.png'
+              : 'images/navbar/log_in.png'
+          }
           alt='projects'
         ></Box>
         <Button
@@ -84,11 +88,11 @@ function LOgInButton(props) {
           onClick={() => {
             props.history.push('/login?student');
             handleClose();
-            /*props.changeUser({
-              auth: true,
+            props.changeUser({
+              auth: false,
               type: 'student',
-              userId: 'S1234',
-            });*/
+              userId: '',
+            });
           }}
           sx={{ color: 'primary.main' }}
         >
@@ -98,13 +102,18 @@ function LOgInButton(props) {
               bgcolor: 'primary.light',
               marginRight: '0.3rem',
             }}
-          />{' '}
+          />
           Student
         </MenuItem>
         <MenuItem
           onClick={() => {
-            props.history.push('/login?mentor');
+            props.history.push('/login');
             handleClose();
+            props.changeUser({
+              auth: false,
+              type: 'mentor',
+              userId: '',
+            });
           }}
           sx={{ color: 'primary.main' }}
         >
@@ -114,28 +123,32 @@ function LOgInButton(props) {
               bgcolor: 'primary.light',
               marginRight: '0.3rem',
             }}
-          />{' '}
+          />
           Mentor
         </MenuItem>
         <MenuItem
           onClick={() => {
-            props.history.push('/login?admin');
+            props.history.push('/login');
             handleClose();
+            props.changeUser({
+              auth: false,
+              type: 'admin',
+              userId: '',
+            });
           }}
           sx={{ color: 'primary.main' }}
         >
-          <Avatar
-            sx={{
-              color: 'primary.main',
-              bgcolor: 'primary.light',
-              marginRight: '0.3rem',
-            }}
-          />{' '}
-          Admin
+          <Box
+            component='img'
+            src='/images/navbar/admin.png'
+            sx={{ height: '1.5rem', marginRight: '1rem', marginLeft: '0.8rem' }}
+            alt='projects'
+          ></Box>
+          <Typography>Admin</Typography>
         </MenuItem>
       </Menu>
     </Box>
   );
 }
 
-export default withRouter(withSnackbar(LOgInButton));
+export default withRouter(withSnackbar(LogInButton));

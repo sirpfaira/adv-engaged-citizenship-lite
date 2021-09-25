@@ -11,7 +11,7 @@ const headersData = {
       id: 2,
     },
     {
-      label: 'Upcoming Events',
+      label: 'Events',
       href: '/events',
       id: 3,
     },
@@ -21,9 +21,9 @@ const headersData = {
       id: 4,
     },
     {
-      label: 'About Us',
-      href: '/about',
-      id: 5,
+      label: 'Users\' Portal',
+      href: '/dashboard',
+      id: 9,
     },
   ],
   student: [
@@ -55,8 +55,8 @@ const headersData = {
   ],
   mentor: [
     {
-      label: 'My Projects',
-      href: '/myprojects',
+      label: 'Feedback Requests',
+      href: '/feedbackrequests',
       id: 1,
     },
     {
@@ -73,6 +73,29 @@ const headersData = {
     {
       label: 'Profile',
       href: '/myprofile',
+      id: 6,
+    },
+  ],
+  admin: [
+    {
+      label: 'Manage Users',
+      href: '/manageusers',
+      id: 1,
+    },
+    {
+      label: 'Manage News',
+      href: '/managenews',
+      id: 2,
+    },
+    {
+      label: 'Manage Events',
+      href: '/manageevents',
+      id: 3,
+    },
+
+    {
+      label: 'Add admin',
+      href: '/addadmin',
       id: 6,
     },
   ],

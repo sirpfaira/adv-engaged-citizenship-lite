@@ -3,7 +3,6 @@ import Avatar from '@mui/material/Avatar';
 import Button from '@mui/material/Button';
 import TextField from '@mui/material/TextField';
 import FormControlLabel from '@mui/material/FormControlLabel';
-//import Checkbox from '@mui/material/Checkbox';
 import FormLink from '@mui/material/Link';
 import Grid from '@mui/material/Grid';
 import Box from '@mui/material/Box';
@@ -13,17 +12,13 @@ import Container from '@mui/material/Container';
 import Radio from '@mui/material/Radio';
 import RadioGroup from '@mui/material/RadioGroup';
 import FormControl from '@mui/material/FormControl';
-//import FormLabel from '@mui/material/FormLabel';
-import { useLocation } from 'react-router-dom';
-//import theme from '../../themes/theme';
 import { withSnackbar } from 'notistack';
+import HEADERS_DATA from '../../components/headers_data';
 
 const LogIn = (props) => {
-  const { search } = useLocation();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  //const [error, setError] = useState('');
-  const [type, setType] = useState(search.replace('?', '') || 'student');
+  const [type, setType] = useState(props.user.type || 'student');
 
   const handleEmail = (event) => {
     event.preventDefault();
@@ -39,39 +34,60 @@ const LogIn = (props) => {
     setType(event.target.value);
   };
 
-  const handleSubmit = (event) => {
+  const handleSubmit = async (event) => {
     event.preventDefault();
-    let aunthenticated = authenticateUser(email, password);
+    const aunthenticated = await authenticateUser(email, password);
 
     if (aunthenticated) {
-      props.changeUser({ auth: true, type: 'student', userId: email });
+      //props.changeUser({ auth: true, type: type, userId: email });
       setEmail('');
       setPassword('');
+      props.changeHeaders(HEADERS_DATA[type]);
       props.history.push('/dashboard');
     }
   };
 
-  const authenticateUser = (userEmail, userPwd) => {
-    const error = 'Invalid user email or password';
+  const authenticateUser = async (userEmail, userPwd) => {
     if (userEmail && userPwd) {
-      if (userEmail === 'user' && userPwd === 'user') {
-        //setError('');
-        props.enqueueSnackbar('Logged in sucessfully!', { variant: 'success' });
-        return true;
-      } else {
-        //setError('Invalid user email or password');
-        props.enqueueSnackbar(error, { variant: 'error' });
+      const res = await fetch(
+        `/verify${type}?userEmail=${userEmail}&userPwd=${userPwd}`
+      );
+      const body = await res.json();
+      if (res.status !== 200) {
+        props.enqueueSnackbar(body.message, {
+          variant: 'error',
+        });
         return false;
+      } else {
+        if (body.authorised) {
+          props.changeUser({ auth: true, type: type, userId: body.userId });
+          props.enqueueSnackbar('Logged in sucessfully!', {
+            variant: 'success',
+          });
+          return true;
+        } else {
+          props.enqueueSnackbar(body.message, {
+            variant: 'error',
+          });
+          return false;
+        }
       }
     } else {
-      //setError('Please provide all fields');
-      props.enqueueSnackbar(error, { variant: 'error' });
+      props.enqueueSnackbar('Please provide all fields', { variant: 'error' });
       return false;
     }
   };
 
   return (
-    <>
+    <Container
+      sx={{
+        backgroundImage: `url('/images/background/bg1.png')`,
+        width: '100%',
+        minHeight: '100vh',
+        paddingTop: '1rem',
+        paddingBottom: '1rem',
+      }}
+    >
       <Container component='main' maxWidth='xs'>
         <Box
           sx={{
@@ -153,7 +169,7 @@ const LogIn = (props) => {
           </Box>
         </Box>
       </Container>
-    </>
+    </Container>
   );
 };
 

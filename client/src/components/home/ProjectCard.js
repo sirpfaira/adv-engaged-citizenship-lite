@@ -14,7 +14,7 @@ export default function ProjectCard({ project }) {
 			<CardMedia
 				component="img"
 				height="140"
-				image={project.src}
+				image={project.img}
 				alt="featured project"
 			/>
 			<CardContent

@@ -1,4 +1,3 @@
-//import { useState, useEffect } from "react";
 import {
   Box,
   Stack,
@@ -6,28 +5,22 @@ import {
   Grid,
   Divider,
   Container,
-  Button,
-  /*Card,
-	CardActions,
-	CardContent,
-	CardMedia,*/
 } from '@mui/material';
+
 import styled from 'styled-components';
 import { useHistory } from 'react-router-dom';
 import ProjectCard from './ProjectCard';
-import PROJECTS from '../../assets/data/projects.json';
-import BG from '../../assets/images/bg.jpg';
 import Testimonials from './Testimonials';
 import Team from './Team';
-import HOME_PAGE_DATA from '../../assets/data/homePageData.json';
 //import theme from '../../themes/theme';
 
 const Content = (props) => {
   let history = useHistory();
+
   return (
     <Container
       sx={{
-        backgroundImage: `url(${BG})`,
+        backgroundImage: `url('/images/background/bg1.png')`,
         maxWidth: '100%',
         minHeight: '90vh',
         paddingBottom: '1rem',
@@ -53,23 +46,17 @@ const Content = (props) => {
                   padding: '1rem',
                 }}
               >
-                <Typography>
+                <WrappingText>
+                  <WrappedImage onClick={() => history.push('/register')}>
+                    <img src='/images/home/join2.png' alt='join now' />
+                  </WrappedImage>
                   A platform where students can journey with a team of mentors
                   to assist with the innovation of project ideas, during the
                   conceptualization and implementation phase. It allows students
                   to complete a standard template with prompts to answer key
                   questions. It also allows university staff to provide feedback
                   and mentorship via the platform.
-                </Typography>
-                <Join>
-                  <Button
-                    variant='contained'
-                    sx={{ margin: '0.7rem', textTransform: 'none' }}
-                    onClick={() => history.push('/register')}
-                  >
-                    {`Join Now >>>`}
-                  </Button>
-                </Join>
+                </WrappingText>
               </Box>
             </Grid>
           </Grid>
@@ -89,18 +76,18 @@ const Content = (props) => {
             border-color='primary.grey'
           />
           <Grid container spacing={2} sx={{ marginTop: '1.3rem' }}>
-            {PROJECTS.map((project) => (
-              <Grid item xs={12} sm={6} md={4} key={project.name}>
+            {props.projects.map((project, index) => (
+              <Grid item xs={12} sm={6} md={4} key={`${project.name}-${index}`}>
                 <ProjectCard project={project} />
               </Grid>
             ))}
           </Grid>
         </Box>
         <Box>
-          <Testimonials data={HOME_PAGE_DATA.testimonials} />
+          <Testimonials testimonials={props.testimonials} />
         </Box>
         <Box>
-          <Team data={HOME_PAGE_DATA.team} />
+          <Team team={props.team} />
         </Box>
       </Stack>
     </Container>
@@ -109,9 +96,13 @@ const Content = (props) => {
 
 export default Content;
 
-const Join = styled.div`
-  display: flex;
-  flex-direction: row;
-  justify-content: end;
+const WrappingText = styled.div`
   width: 100%;
+`;
+const WrappedImage = styled.div`
+  img {
+    float: right;
+    margin: 1rem;
+    width: 150px;
+  }
 `;

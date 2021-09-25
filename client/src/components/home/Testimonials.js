@@ -15,16 +15,16 @@ const Testimonials = (props) => {
         />
 
         <Grid>
-          {props.data
-            ? props.data.map((d, i) => (
-                <Holder key={`${d.name}-${i}`}>
+          {props.testimonials
+            ? props.testimonials.map((testimonial, i) => (
+                <Holder key={`${testimonial.name}-${i}`}>
                   <Item>
                     <ImageHolder>
-                      <img src={`/${d.img}`} alt='' />
+                      <img src={`${testimonial.img}`} alt='' />
                     </ImageHolder>
                     <Content>
-                      <p>"{d.text}"</p>
-                      <Meta> - {d.name} </Meta>
+                      <p>"{testimonial.message}"</p>
+                      <Meta> - {testimonial.name} </Meta>
                     </Content>
                   </Item>
                 </Holder>

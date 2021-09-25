@@ -1,35 +1,91 @@
-import React from 'react';
+import { useState, useEffect } from 'react';
 import { Typography, Box } from '@mui/material';
-import Card from '@mui/material/Card';
+import { Card, Container } from '@mui/material';
 import CardActions from '@mui/material/CardActions';
 import CardContent from '@mui/material/CardContent';
 import Button from '@mui/material/Button';
+import DeleteIcon from '@mui/icons-material/Delete';
 import styled from 'styled-components';
 import moment from 'moment';
-import USER_NOTIFICATIONS from '../../assets/data/userNotifications';
+import Loading from '../../components/Loading';
+import Error from '../../components/Error';
+//import USER_NOTIFICATIONS from '../../assets/data/userNotifications';
 
 function AllNotifications(props) {
   if (props.user.userId) {
+    const markAsRead = async () => {
+      try {
+        await fetch(`/markallnotificationsread/${props.user.userId}`, {
+          method: 'PUT',
+        });
+      } catch {
+        alert('error!');
+      }
+    };
+    markAsRead();
   } else {
     props.history.push('/');
   }
+
+  const [refresh, setRefresh] = useState(false);
+  const [myNotifications, setMyNotifications] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(false);
+
+  useEffect(() => {
+    const getNotifications = async () => {
+      const res = await fetch(`/notifications/${props.user.userId}`);
+      const body = await res.json();
+      if (res.status !== 200) {
+        setError(true);
+      } else {
+        //.slice() protects the original array from being modified
+        //because it create a copy of the array prior to sorting.
+        const sortedNotifications = body
+          .slice()
+          .sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
+        console.log(sortedNotifications);
+        setMyNotifications(sortedNotifications);
+        setError(false);
+      }
+      setLoading(false);
+    };
+    getNotifications();
+  }, []);
+
   return (
-    <Holder>
-      <Typography
-        sx={{
-          fontWeight: '600',
-          fontSize: '2rem',
-          marginBottom: '0.7rem',
-        }}
-      >
-        All Notifications
-      </Typography>
-      <Box>
-        {USER_NOTIFICATIONS.map((notification, index) => (
-          <NotificationCard notification={notification} />
-        ))}
-      </Box>
-    </Holder>
+    <Container
+      sx={{
+        backgroundImage: `url('/images/background/bg1.png')`,
+        width: '100%',
+        minHeight: '100vh',
+        paddingTop: '1rem',
+        paddingBottom: '1rem',
+      }}
+    >
+      <Holder>
+        <Typography
+          sx={{
+            fontWeight: '600',
+            fontSize: '2rem',
+            marginBottom: '0.7rem',
+          }}
+        >
+          All Notifications
+        </Typography>
+        {loading ? (
+          <Loading />
+        ) : error ? (
+          <Error />
+        ) : (
+          <Box>
+            {myNotifications.map((notification, index) => (
+              <NotificationCard notification={notification} key={index} />
+            ))}
+          </Box>
+        )}
+      </Holder>
+    </Container>
   );
 }
 
@@ -65,7 +121,7 @@ const NotificationCard = ({ notification }) => {
           }}
         >
           <Typography variant='h6' component='div' sx={{ marginRight: '1rem' }}>
-            Project Mission Impossible
+            {notification.title}
           </Typography>
           <Typography variant='body2' component='div' color='primary.green'>
             {getElapsedTime(notification.timestamp)}
@@ -76,7 +132,9 @@ const NotificationCard = ({ notification }) => {
         </Typography>
       </CardContent>
       <CardActions>
-        <Button size='small'>Delete</Button>
+        <Button size='small' startIcon={<DeleteIcon />}>
+          Delete
+        </Button>
       </CardActions>
     </Card>
   );

@@ -20,8 +20,8 @@ const Team = (props) => {
           </p>
         </div>
         <Grid>
-          {props.data
-            ? props.data.map((d, i) => (
+          {props.team
+            ? props.team.map((d, i) => (
                 <Holder key={`${d.name}-${i}`}>
                   <Thumbnail>
                     <img src={d.img} alt='...' className='team-img' />
@@ -29,7 +29,7 @@ const Team = (props) => {
                       <Typography sx={{ fontWeight: 600, fontSize: '1rem' }}>
                         {d.name}
                       </Typography>
-                      <Typography>{d.job}</Typography>
+                      <Typography>{d.role}</Typography>
                     </Caption>
                   </Thumbnail>
                 </Holder>
