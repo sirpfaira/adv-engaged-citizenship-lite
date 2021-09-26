@@ -10,6 +10,7 @@ import Profile from './pages/dashboard/Profile';
 import EditProfile from './pages/dashboard/EditProfile';
 import HEADERS_DATA from './components/headers_data';
 import ImageUpload from './pages/dashboard/ImageUpload';
+import Settings from './pages/dashboard/Settings';
 
 function App(props) {
   const [user, setUser] = useState({
@@ -96,6 +97,16 @@ function App(props) {
             render={(props) =>
               user.auth ? (
                 <Profile {...props} user={user} />
+              ) : (
+                <Redirect to='/login' />
+              )
+            }
+          />
+          <Route
+            path='/accountsettings'
+            render={(props) =>
+              user.auth ? (
+                <Settings {...props} user={user} />
               ) : (
                 <Redirect to='/login' />
               )

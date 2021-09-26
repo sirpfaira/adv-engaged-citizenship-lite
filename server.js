@@ -92,6 +92,27 @@ app.get('/students/:studentId', async function (req, res) {
   }
 });
 
+app.get('/myprojects/:studentId', async function (req, res) {
+  const { studentId } = req.params;
+  if (studentId) {
+    try {
+      const result = await pool.query(
+        `SELECT * FROM projects where $1 = ANY(owners)`,
+        [studentId]
+      );
+      if (result.rowCount > 0) {
+        res.status(200).json(result.rows[0]);
+      } else {
+        res.status(500).json('No data found!');
+      }
+    } catch (error) {
+      res.status(500).json('error occured');
+    }
+  } else {
+    res.status(500).json('error occured');
+  }
+});
+
 app.put('/students/:studentId', async function (req, res) {
   const { studentId } = req.params;
   const stud = req.body;
@@ -99,7 +120,7 @@ app.put('/students/:studentId', async function (req, res) {
     if (stud) {
       try {
         await pool.query(
-          `UPDATE students SET firstname = $1, lastname = $2, gender = $3, studnum = $4, email = $5, phone = $6, state = $7, bio = $8, password = $9 WHERE id = $10;`,
+          `UPDATE students SET firstname = $1, lastname = $2, gender = $3, studnum = $4, email = $5, phone = $6, state = $7, bio = $8 WHERE id = $9;`,
           [
             stud.firstname,
             stud.lastname,
@@ -109,7 +130,6 @@ app.put('/students/:studentId', async function (req, res) {
             stud.phone,
             stud.state,
             stud.bio,
-            stud.password,
             studentId,
           ]
         );

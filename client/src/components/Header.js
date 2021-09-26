@@ -18,6 +18,7 @@ import MenuIcon from '@mui/icons-material/Menu';
 import AboutIcon from '@mui/icons-material/Info';
 import AccountCircle from '@mui/icons-material/AccountCircle';
 import PortalIcon from '@mui/icons-material/Group';
+import SettingsIcon from '@mui/icons-material/Settings';
 import { useState, useEffect } from 'react';
 import { Link as RouterLink } from 'react-router-dom';
 import { useHistory } from 'react-router-dom';
@@ -326,6 +327,8 @@ function Header(props) {
         );
       case 9:
         return <PortalIcon />;
+      case 10:
+        return <SettingsIcon />;
       default:
         return <MenuIcon />;
     }

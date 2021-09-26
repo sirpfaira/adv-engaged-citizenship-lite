@@ -4,13 +4,11 @@ import { Divider } from '@mui/material';
 import Content from '../../components/home/Content';
 import Footer from '../../components/home/Footer';
 import Loading from '../../components/Loading';
+//import Settings from '../dashboard/Settings';
 //import theme from '../../themes/theme';
 import HEADERS_DATA from '../../components/headers_data';
 
 const Home = (props) => {
-  // const [projects, setProjects] = useState([]);
-  // const [testimonials, setTestimonials] = useState([]);
-  // const [team, setTeam] = useState([]);
   const [data, setData] = useState({
     projects: [],
     testimonials: [],

@@ -21,7 +21,7 @@ const headersData = {
       id: 4,
     },
     {
-      label: 'Users\' Portal',
+      label: "Users' Portal",
       href: '/dashboard',
       id: 9,
     },
@@ -43,9 +43,9 @@ const headersData = {
       id: 1,
     },
     {
-      label: 'Events',
-      href: '/events',
-      id: 3,
+      label: 'Settings',
+      href: '/accountsettings',
+      id: 10,
     },
     {
       label: 'Competitions',

@@ -26,9 +26,6 @@ const EditStudentProfile = (props) => {
     phone: data.phone || null,
     state: data.state || '',
     bio: data.bio || '',
-    oldpwd: '',
-    newpwd: '',
-    password: data.password,
   });
 
   const saveProfileInfo = () => {
@@ -41,21 +38,7 @@ const EditStudentProfile = (props) => {
       values.phone &&
       values.state
     ) {
-      if (values.oldpwd && values.newpwd) {
-        if (values.oldpwd === values.password) {
-          setValues({
-            ...values,
-            password: values.newpwd,
-          });
-          sendInfoToServer();
-        } else {
-          props.enqueueSnackbar('Password is incorrect!', {
-            variant: 'error',
-          });
-        }
-      } else {
-        sendInfoToServer();
-      }
+      sendInfoToServer();
     } else {
       props.enqueueSnackbar('Please provide all fields', { variant: 'error' });
     }
@@ -101,7 +84,7 @@ const EditStudentProfile = (props) => {
       <form autoComplete='off' noValidate {...props}>
         <Card>
           <CardHeader
-            subheader='You must fill in all the required fields. The password fields are optional, only fill them if you really want change your password.'
+            subheader='You must fill in all the fields.'
             title='Profile'
           />
           <Divider />
@@ -205,41 +188,8 @@ const EditStudentProfile = (props) => {
               </Grid>
               <Grid item md={6} xs={12}>
                 <TextField
-                  fullWidth
-                  inputProps={{
-                    autocomplete: 'new-password',
-                    form: {
-                      autocomplete: 'off',
-                    },
-                  }}
-                  label='Old password'
-                  name='oldpwd'
-                  onChange={handleChange}
-                  type='password'
-                  value={values.oldpwd}
-                  variant='outlined'
-                />
-              </Grid>
-              <Grid item md={6} xs={12}>
-                <TextField
-                  fullWidth
-                  inputProps={{
-                    autocomplete: 'new-password',
-                    form: {
-                      autocomplete: 'off',
-                    },
-                  }}
-                  label='New Password'
-                  name='newpwd'
-                  onChange={handleChange}
-                  type='password'
-                  value={values.newpwd}
-                  variant='outlined'
-                />
-              </Grid>
-              <Grid item md={6} xs={12}>
-                <TextField
                   multiline
+                  required
                   fullWidth
                   label='Bio'
                   name='bio'
