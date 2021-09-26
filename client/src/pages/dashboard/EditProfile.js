@@ -62,7 +62,7 @@ const EditStudentProfile = (props) => {
   };
 
   const sendInfoToServer = async () => {
-    const res = await fetch(`/${props.user.type}s/${props.user.userId}`, {
+    const res = await fetch(`/${props.user.role}s/${props.user.userId}`, {
       method: 'PUT',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(values),
@@ -110,9 +110,8 @@ const EditStudentProfile = (props) => {
               <Grid item md={6} xs={12}>
                 <TextField
                   fullWidth
-                  helperText='Please specify the first name'
                   label='First name'
-                  name='firstName'
+                  name='firstname'
                   onChange={handleChange}
                   required
                   value={values.firstname}
@@ -123,7 +122,7 @@ const EditStudentProfile = (props) => {
                 <TextField
                   fullWidth
                   label='Last name'
-                  name='lastName'
+                  name='lastname'
                   onChange={handleChange}
                   required
                   value={values.lastname}

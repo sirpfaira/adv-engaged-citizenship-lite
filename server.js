@@ -20,7 +20,9 @@ const pool = new Pool({
 
 app.get('/projects', async (req, res) => {
   try {
-    const result = await pool.query('SELECT * FROM projects');
+    const result = await pool.query(
+      'SELECT * FROM projects WHERE featured = true LIMIT 12'
+    );
     if (result.rowCount > 0) {
       res.status(200).json(result.rows);
     } else {
@@ -123,28 +125,6 @@ app.put('/students/:studentId', async function (req, res) {
   }
 });
 
-app.put('/uploadprofilephoto/:studentId', async function (req, res) {
-  console.log('endpoint was hit');
- 
-  const { studentId } = req.params;
-  const photo = req.body;
-  if (studentId) {
-    if (photo) {
-      try {
-        // await pool.query('');
-         console.log(req.file);
-        res.status(200).json('Sucess');
-      } catch (error) {
-        res.status(500).json('An error occured');
-      }
-    } else {
-      res.status(500).json('No photo found!');
-    }
-  } else {
-    res.status(500).json('No student id was provided!');
-  }
-});
-
 app.get('/verifystudent', async function (req, res) {
   const { userEmail, userPwd } = req.query;
 
@@ -187,17 +167,13 @@ app.get('/verifystudent', async function (req, res) {
 
 app.get('/notifications/:userId', async function (req, res) {
   const { userId } = req.params;
-  console.log(`userID: ${userId}`);
+  //console.log(`userID: ${userId}`);
   if (userId) {
     try {
       const result = await pool.query(
-        `SELECT * FROM notifications WHERE userId = ${Number(userId)}`
+        `SELECT * FROM notifications WHERE user_id = ${Number(userId)}`
       );
-      if (result.rowCount > 0) {
-        res.status(200).json(result.rows);
-      } else {
-        res.status(500).json('No data found!');
-      }
+      res.status(200).json(result.rows);
     } catch (error) {
       res.status(500).json('error occured');
     }
@@ -211,7 +187,7 @@ app.get('/unreadnotifications/:userId', async function (req, res) {
   if (userId) {
     try {
       const result = await pool.query(
-        `SELECT * FROM notifications WHERE userid = ${Number(
+        `SELECT * FROM notifications WHERE user_id = ${Number(
           userId
         )} AND read = false`
       );
@@ -229,7 +205,7 @@ app.put('/markallnotificationsread/:userId', async function (req, res) {
   if (userId) {
     try {
       const result = await pool.query(
-        `UPDATE notifications SET read = true WHERE userId = ${Number(userId)}`
+        `UPDATE notifications SET read = true WHERE user_id = ${Number(userId)}`
       );
       res.status(200).json(result.rowCount);
     } catch (error) {
@@ -240,6 +216,22 @@ app.put('/markallnotificationsread/:userId', async function (req, res) {
   }
 });
 
+app.delete('/clearallnotifications/:userId', async function (req, res) {
+  const { userId } = req.params;
+  if (userId) {
+    try {
+      await pool.query(
+        `DELETE FROM notifications WHERE user_id = ${Number(userId)}`
+      );
+      res.status(200).json('Sucess');
+    } catch (error) {
+      res.status(500).json('error occured');
+    }
+  } else {
+    res.status(500).json('error occured');
+  }
+});
+
 app.get('/', (req, res) => {
   res
     .status(200)
@@ -247,7 +239,7 @@ app.get('/', (req, res) => {
 });
 
 app.post('/', (req, res) => {
-  console.log(req.body);
+  //console.log(req.body);
   res
     .status(200)
     .send(

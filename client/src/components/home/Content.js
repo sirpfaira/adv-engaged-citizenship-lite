@@ -16,6 +16,7 @@ import Team from './Team';
 
 const Content = (props) => {
   let history = useHistory();
+  console.log(props.projects);
 
   return (
     <Container

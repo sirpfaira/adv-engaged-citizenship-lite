@@ -8,14 +8,14 @@ import Box from '@mui/material/Box';
 import LockOutlinedIcon from '@mui/icons-material/LockOutlined';
 import Typography from '@mui/material/Typography';
 import Container from '@mui/material/Container';
-import { withSnackbar } from 'notistack';
-import HEADERS_DATA from '../../components/headers_data';
 
-const LogIn = (props) => {
+const Register = (props) => {
   const [values, setValues] = useState({
+    first_name: '',
+    last_name: '',
     email: '',
     password: '',
-    role: props.user.role || 'student',
+    role: 'student',
   });
 
   const handleChange = (event) => {
@@ -25,62 +25,18 @@ const LogIn = (props) => {
     });
   };
 
-  const handleSubmit = async (event) => {
+  const handleSubmit = (event) => {
     event.preventDefault();
-    const aunthenticated = await authenticateUser(
-      values.email,
-      values.password
-    );
-
-    if (aunthenticated) {
-      props.changeHeaders(HEADERS_DATA[values.role]);
-      props.history.push('/dashboard');
-    }
-  };
-
-  const authenticateUser = async (userEmail, userPwd) => {
-    if (userEmail && userPwd) {
-      const res = await fetch(
-        `/verify${values.role}?userEmail=${userEmail}&userPwd=${userPwd}`
-      );
-      const body = await res.json();
-      if (res.status !== 200) {
-        props.enqueueSnackbar(body.message, {
-          variant: 'error',
-        });
-        return false;
-      } else {
-        if (body.authorised) {
-          props.changeUser({
-            auth: true,
-            role: values.role,
-            userId: body.userId,
-          });
-          props.enqueueSnackbar('Logged in sucessfully!', {
-            variant: 'success',
-          });
-          return true;
-        } else {
-          props.enqueueSnackbar(body.message, {
-            variant: 'error',
-          });
-          return false;
-        }
-      }
-    } else {
-      props.enqueueSnackbar('Please provide all fields', { variant: 'error' });
-      return false;
-    }
   };
 
   return (
     <Container
       sx={{
         backgroundImage: `url('/images/background/bg1.png')`,
-        width: '100%',
-        minHeight: '100vh',
-        paddingTop: '1rem',
-        paddingBottom: '1rem',
+        maxWidth: '100%',
+        minHeight: '90vh',
+        paddingBottom: '2rem',
+        marginTop: '2rem',
       }}
     >
       <Container component='main' maxWidth='xs'>
@@ -92,7 +48,7 @@ const LogIn = (props) => {
             alignItems: 'center',
           }}
         >
-          <Avatar sx={{ m: 1, bgcolor: 'primary.main' }}>
+          <Avatar sx={{ m: 1, bgcolor: 'secondary.main' }}>
             <LockOutlinedIcon />
           </Avatar>
           <Typography component='h1' variant='h5'>
@@ -100,7 +56,7 @@ const LogIn = (props) => {
               .replace('?', '')
               .replace(/(\w)(\w*)/g, function (g0, g1, g2) {
                 return g1.toUpperCase() + g2.toLowerCase();
-              })} Log In`}
+              })}  Registration`}
           </Typography>
           <Box
             component='form'
@@ -108,6 +64,31 @@ const LogIn = (props) => {
             noValidate
             sx={{ mt: 1 }}
           >
+            <TextField
+              margin='normal'
+              required
+              fullWidth
+              id='name'
+              label='First Name'
+              name='first_name'
+              autoComplete='name'
+              autoFocus
+              value={values.first_name}
+              onChange={handleChange}
+            />
+            {/* STUDENT SURNAME */}
+            <TextField
+              margin='normal'
+              required
+              fullWidth
+              label='Last Name'
+              name='last_name'
+              autoComplete='surname'
+              autoFocus
+              value={values.last_name}
+              onChange={handleChange}
+            />
+
             <TextField
               margin='normal'
               required
@@ -128,9 +109,15 @@ const LogIn = (props) => {
               label='Password'
               type='password'
               id='password'
-              autoComplete='current-password'
+              autoComplete='off'
               value={values.password}
               onChange={handleChange}
+              inputProps={{
+                autocomplete: 'new-password',
+                form: {
+                  autocomplete: 'off',
+                },
+              }}
             />
             <TextField
               fullWidth
@@ -142,7 +129,7 @@ const LogIn = (props) => {
               SelectProps={{ native: true }}
               value={values.role}
               variant='outlined'
-              sx={{ marginTop: '0.9rem' }}
+              sx={{ marginTop: '1.2rem' }}
             >
               <option key='student' value='student'>
                 Student
@@ -150,23 +137,20 @@ const LogIn = (props) => {
               <option key='mentor' value='mentor'>
                 Mentor
               </option>
-              <option key='admin' value='admin'>
-                Administrator
-              </option>
             </TextField>
             <Button
               type='submit'
               fullWidth
               variant='contained'
-              sx={{ mt: 3, mb: 2 }}
+              sx={{ mt: 3, mb: 2, textTransform: 'none' }}
               onClick={handleSubmit}
             >
-              Log In
+              Sign Up
             </Button>
             <Grid container>
               <Grid item xs>
                 <FormLink href='#' variant='body2'>
-                  Forgot password?
+                  Need help signing up?
                 </FormLink>
               </Grid>
             </Grid>
@@ -177,4 +161,4 @@ const LogIn = (props) => {
   );
 };
 
-export default withSnackbar(LogIn);
+export default Register;

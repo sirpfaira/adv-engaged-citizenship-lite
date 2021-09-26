@@ -20,7 +20,7 @@ function Dashboard(props) {
   return (
     <div>
       <div>
-        <h1>{`WELCOME ${props.user.type} - ${props.user.userId}!`}</h1>
+        <h1>{`WELCOME ${props.user.role} - ${props.user.userId}!`}</h1>
         <h2>DASHBOARD</h2>
         <button>Log out</button>
       </div>

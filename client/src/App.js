@@ -3,6 +3,7 @@ import { useState } from 'react';
 import Header from './components/Header';
 import Home from './pages/home/Home';
 import LogIn from './pages/login/LogIn';
+import Register from './pages/login/Register';
 import Dashboard from './pages/dashboard/Dashboard';
 import AllNotifications from './pages/dashboard/AllNotifications';
 import Profile from './pages/dashboard/Profile';
@@ -13,7 +14,7 @@ import ImageUpload from './pages/dashboard/ImageUpload';
 function App(props) {
   const [user, setUser] = useState({
     auth: false,
-    type: '',
+    role: '',
     userId: '',
   });
 
@@ -48,6 +49,17 @@ function App(props) {
             path='/login'
             render={(props) => (
               <LogIn
+                {...props}
+                user={user}
+                changeUser={changeUser}
+                changeHeaders={changeHeaders}
+              />
+            )}
+          />
+          <Route
+            path='/register'
+            render={(props) => (
+              <Register
                 {...props}
                 user={user}
                 changeUser={changeUser}
