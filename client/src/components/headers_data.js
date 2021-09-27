@@ -16,12 +16,12 @@ const headersData = {
       id: 3,
     },
     {
-      label: 'Register',
-      href: '/register',
+      label: 'Sign Up',
+      href: '/signup',
       id: 4,
     },
     {
-      label: "Users' Portal",
+      label: "My Dashboard",
       href: '/dashboard',
       id: 9,
     },

@@ -1,22 +1,62 @@
-import React, { useState } from 'react';
-import Avatar from '@mui/material/Avatar';
-import Button from '@mui/material/Button';
-import TextField from '@mui/material/TextField';
+import React, { useState, useEffect } from 'react';
 import FormLink from '@mui/material/Link';
-import Grid from '@mui/material/Grid';
-import Box from '@mui/material/Box';
+import {
+  Box,
+  Modal,
+  Grid,
+  TextField,
+  Button,
+  Avatar,
+  CircularProgress,
+} from '@mui/material';
 import LockOutlinedIcon from '@mui/icons-material/LockOutlined';
 import Typography from '@mui/material/Typography';
 import Container from '@mui/material/Container';
 import { withSnackbar } from 'notistack';
-import HEADERS_DATA from '../../components/headers_data';
+import moment from 'moment';
 
 const LogIn = (props) => {
   const [values, setValues] = useState({
     email: '',
     password: '',
     role: props.user.role || 'student',
+    user_id: '',
+    user_name: '',
+    last_login: props.user.last_login,
   });
+
+  useEffect(() => {
+    let localUserData = localStorage.getItem('user');
+    //console.log(`userProfile=${localUserData}`);
+    //console.log(`userProfile=${localUserData.user_name}`);
+    if (localUserData) {
+      let userProfile = JSON.parse(localUserData);
+      var last_login_date = moment(userProfile.last_login, 'YYYY-MM-DD HH:mm');
+      var current = moment();
+      const minutes = Math.floor(
+        moment.duration(current.diff(last_login_date)).asMinutes()
+      );
+      //console.log(minutes);
+      if (minutes > 720) {
+        props.changeUser({
+          auth: false,
+          role: '',
+          user_id: '',
+          user_name: '',
+          last_login: '',
+        });
+        localStorage.removeItem('user');
+      } else {
+        handleModalClose();
+        props.history.push('/dashboard');
+        props.changeUser(userProfile);
+      }
+    }
+  }, []);
+
+  const [modalOpen, setModalOpen] = useState(false);
+  const handleModalOpen = () => setModalOpen(true);
+  const handleModalClose = () => setModalOpen(false);
 
   const handleChange = (event) => {
     setValues({
@@ -27,14 +67,20 @@ const LogIn = (props) => {
 
   const handleSubmit = async (event) => {
     event.preventDefault();
+    handleModalOpen();
     const aunthenticated = await authenticateUser(
       values.email,
       values.password
     );
 
     if (aunthenticated) {
-      props.changeHeaders(HEADERS_DATA[values.role]);
+      //console.log(`Values: ${JSON.stringify(values)}`);
+
+      handleModalClose();
+      //props.changeHeaders(HEADERS_DATA[values.role]);
       props.history.push('/dashboard');
+    } else {
+      handleModalClose();
     }
   };
 
@@ -51,11 +97,17 @@ const LogIn = (props) => {
         return false;
       } else {
         if (body.authorised) {
-          props.changeUser({
+          console.log(`Body: ${JSON.stringify(body)}`);
+          let newUser = {
             auth: true,
             role: values.role,
-            userId: body.userId,
-          });
+            user_id: body.user_id,
+            user_name: body.user_name,
+            last_login: moment().format('YYYY-MM-DD HH:mm'),
+          };
+          await localStorage.setItem('user', JSON.stringify(newUser));
+          props.changeUser(newUser);
+
           props.enqueueSnackbar('Logged in sucessfully!', {
             variant: 'success',
           });
@@ -83,6 +135,24 @@ const LogIn = (props) => {
         paddingBottom: '1rem',
       }}
     >
+      <Modal
+        open={modalOpen}
+        onClose={handleModalClose}
+        aria-labelledby='modal-modal-title'
+        aria-describedby='modal-modal-description'
+      >
+        <Box sx={modalStyle}>
+          <Typography
+            id='modal-modal-title'
+            variant='h6'
+            component='h2'
+            sx={{ marginBottom: '1rem' }}
+          >
+            Loading...
+          </Typography>
+          <CircularProgress size='2rem' />
+        </Box>
+      </Modal>
       <Container component='main' maxWidth='xs'>
         <Box
           sx={{
@@ -178,3 +248,17 @@ const LogIn = (props) => {
 };
 
 export default withSnackbar(LogIn);
+
+const modalStyle = {
+  position: 'absolute',
+  top: '50%',
+  left: '50%',
+  transform: 'translate(-50%, -50%)',
+  width: 400,
+  bgcolor: 'background.paper',
+  boxShadow: 24,
+  p: 4,
+  display: 'flex',
+  flexDirection: 'column',
+  alignItems: 'center',
+};

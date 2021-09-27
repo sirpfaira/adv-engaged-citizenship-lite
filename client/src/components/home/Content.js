@@ -16,7 +16,6 @@ import Team from './Team';
 
 const Content = (props) => {
   let history = useHistory();
-  console.log(props.projects);
 
   return (
     <Container
@@ -101,6 +100,7 @@ const WrappingText = styled.div`
   width: 100%;
 `;
 const WrappedImage = styled.div`
+  cursor: pointer;
   img {
     float: right;
     margin: 1rem;

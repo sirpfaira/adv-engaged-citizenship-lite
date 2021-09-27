@@ -1,5 +1,5 @@
 import { BrowserRouter, Switch, Route, Redirect } from 'react-router-dom';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import Header from './components/Header';
 import Home from './pages/home/Home';
 import LogIn from './pages/login/LogIn';
@@ -11,23 +11,54 @@ import EditProfile from './pages/dashboard/EditProfile';
 import HEADERS_DATA from './components/headers_data';
 import ImageUpload from './pages/dashboard/ImageUpload';
 import Settings from './pages/dashboard/Settings';
+import moment from 'moment';
 
 function App(props) {
   const [user, setUser] = useState({
     auth: false,
     role: '',
-    userId: '',
+    user_id: '',
+    user_name: '',
+    last_login: '',
   });
+
+  const changeUser = (currentUser) => {
+    setUser(currentUser);
+  };
 
   const [notifications, setNotifications] = useState(0);
   const [headers, setHeaders] = useState(HEADERS_DATA.home);
 
+  useEffect(() => {
+    let localUserData = localStorage.getItem('user');
+    //console.log(`userProfile=${localUserData}`);
+    //console.log(`userProfile=${localUserData.user_name}`);
+    if (localUserData) {
+      let userProfile = JSON.parse(localUserData);
+      var last_login_date = moment(userProfile.last_login, 'YYYY-MM-DD HH:mm');
+      var current = moment();
+      const minutes = Math.floor(
+        moment.duration(current.diff(last_login_date)).asMinutes()
+      );
+      //console.log(minutes);
+      if (minutes > 720) {
+        changeUser({
+          auth: false,
+          role: '',
+          user_id: '',
+          user_name: '',
+          last_login: '',
+        });
+        localStorage.removeItem('user');
+      } else {
+        changeUser(userProfile);
+        //console.log(`userProfile2=${userProfile}`);
+      }
+    }
+  }, []);
+
   const changeNotifications = (count) => {
     setNotifications(count);
-  };
-
-  const changeUser = (currentUser) => {
-    setUser(currentUser);
   };
 
   const changeHeaders = (currentHeaders) => {
@@ -49,12 +80,7 @@ function App(props) {
           <Route
             path='/login'
             render={(props) => (
-              <LogIn
-                {...props}
-                user={user}
-                changeUser={changeUser}
-                changeHeaders={changeHeaders}
-              />
+              <LogIn {...props} user={user} changeUser={changeUser} />
             )}
           />
           <Route
@@ -76,6 +102,7 @@ function App(props) {
                   {...props}
                   user={user}
                   changeNotifications={changeNotifications}
+                  changeHeaders={changeHeaders}
                 />
               ) : (
                 <Redirect to='/login' />

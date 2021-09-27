@@ -1,8 +1,8 @@
 import * as React from 'react';
 import Box from '@mui/material/Box';
-import { Typography, CircularProgress, Container } from '@mui/material';
+import { Typography, Container } from '@mui/material';
 
-const Error = () => {
+const Error = ({ message }) => {
   return (
     <Container
       sx={{
@@ -31,7 +31,7 @@ const Error = () => {
           sx={{ height: '10rem' }}
         ></Box>
         <Typography sx={{ marginTop: '2rem', fontSize: '1.5rem' }}>
-          Fatal error! Could not load content from server!
+          {message || 'Fatal error! Could not load content from server!'}
         </Typography>
       </Box>
     </Container>

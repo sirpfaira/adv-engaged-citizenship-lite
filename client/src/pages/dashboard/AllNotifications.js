@@ -18,10 +18,10 @@ import Error from '../../components/Error';
 //import USER_NOTIFICATIONS from '../../assets/data/userNotifications';
 
 function AllNotifications(props) {
-  if (props.user.userId) {
+  if (props.user.user_id) {
     const markAsRead = async () => {
       try {
-        await fetch(`/markallnotificationsread/${props.user.userId}`, {
+        await fetch(`/markallnotificationsread/${props.user.user_id}`, {
           method: 'PUT',
         });
       } catch {
@@ -36,7 +36,7 @@ function AllNotifications(props) {
   const [refresh, setRefresh] = useState(false);
   const [myNotifications, setMyNotifications] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(false);
+  const [error, setError] = useState({ state: false, message: '' });
   const [dialogOpen, setDialogOpen] = useState(false);
 
   const handleDeleteAll = () => {
@@ -49,17 +49,21 @@ function AllNotifications(props) {
 
   useEffect(() => {
     const getNotifications = async () => {
-      const res = await fetch(`/notifications/${props.user.userId}`);
+      const res = await fetch(`/notifications/${props.user.user_id}`);
       const body = await res.json();
       if (res.status !== 200) {
-        setError(true);
+        setError({
+          ...error,
+          state: true,
+          message: body.message,
+        });
       } else {
         //.slice() protects the original array from being modified
         //because it create a copy of the array prior to sorting.
         const sortedNotifications = body
           .slice()
           .sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
-        console.log(sortedNotifications);
+        //console.log(sortedNotifications);
         setMyNotifications(sortedNotifications);
         setError(false);
       }
@@ -70,12 +74,12 @@ function AllNotifications(props) {
 
   const clearAllNotifications = async () => {
     if (myNotifications.length > 0) {
-      const res = await fetch(`/clearallnotifications/${props.user.userId}`, {
+      const res = await fetch(`/clearallnotifications/${props.user.user_id}`, {
         method: 'DELETE',
       });
       const body = await res.json();
       if (res.status !== 200) {
-        props.enqueueSnackbar(body, {
+        props.enqueueSnackbar(body.message, {
           variant: 'error',
         });
       } else {
@@ -134,8 +138,8 @@ function AllNotifications(props) {
         </Box>
         {loading ? (
           <Loading />
-        ) : error ? (
-          <Error />
+        ) : error.state ? (
+          <Error message={error.message} />
         ) : (
           <Box>
             {myNotifications.length > 0 ? (
@@ -181,7 +185,7 @@ const NotificationCard = ({ notification, handleDeleteOne }) => {
     const minutes = Math.floor(
       moment.duration(current.diff(given)).asMinutes()
     );
-    console.log(minutes);
+    //console.log(minutes);
     if (minutes > 518400) {
       const years = Math.floor(minutes / 518400);
       return `${years} ${years === 1 ? ` year ago` : ` years ago`}`;

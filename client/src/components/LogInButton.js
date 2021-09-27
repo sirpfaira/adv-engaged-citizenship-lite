@@ -10,7 +10,6 @@ import { withSnackbar } from 'notistack';
 import HEADERS_DATA from '../components/headers_data';
 
 function LogInButton(props) {
-  // console.log(props);
   const [anchorEl, setAnchorEl] = React.useState(null);
   const open = Boolean(anchorEl);
   const handleClick = (event) => {
@@ -18,9 +17,11 @@ function LogInButton(props) {
       props.enqueueSnackbar('You have been logged out!', { variant: 'error' });
       props.changeUser({
         auth: false,
-        type: '',
-        userId: '',
+        role: '',
+        user_id: '',
+        user_name: '',
       });
+      localStorage.removeItem('user');
       props.changeHeaders(HEADERS_DATA.home);
       props.history.push('/');
     } else {
@@ -90,8 +91,9 @@ function LogInButton(props) {
             handleClose();
             props.changeUser({
               auth: false,
-              type: 'student',
-              userId: '',
+              role: 'student',
+              user_id: '',
+              user_name: '',
             });
           }}
           sx={{ color: 'primary.main' }}
@@ -111,8 +113,9 @@ function LogInButton(props) {
             handleClose();
             props.changeUser({
               auth: false,
-              type: 'mentor',
-              userId: '',
+              role: 'mentor',
+              user_id: '',
+              user_name: '',
             });
           }}
           sx={{ color: 'primary.main' }}
@@ -132,8 +135,9 @@ function LogInButton(props) {
             handleClose();
             props.changeUser({
               auth: false,
-              type: 'admin',
-              userId: '',
+              role: 'admin',
+              user_id: '',
+              user_name: '',
             });
           }}
           sx={{ color: 'primary.main' }}

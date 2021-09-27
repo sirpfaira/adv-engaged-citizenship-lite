@@ -18,10 +18,10 @@ import provinces from '../../assets/data/sa-provinces';
 const EditStudentProfile = (props) => {
   const data = props.history.location.state?.data;
   const [values, setValues] = useState({
-    firstname: data.firstname || '',
-    lastname: data.lastname || '',
+    first_name: data.first_name || '',
+    last_name: data.last_name || '',
     gender: data.gender || 'male',
-    studnum: data.studnum || null,
+    stud_num: data.stud_num || null,
     email: data.email || '',
     phone: data.phone || null,
     state: data.state || '',
@@ -30,10 +30,10 @@ const EditStudentProfile = (props) => {
 
   const saveProfileInfo = () => {
     if (
-      values.firstname &&
-      values.lastname &&
+      values.first_name &&
+      values.last_name &&
       values.gender &&
-      values.studnum &&
+      values.stud_num &&
       values.email &&
       values.phone &&
       values.state
@@ -45,16 +45,17 @@ const EditStudentProfile = (props) => {
   };
 
   const sendInfoToServer = async () => {
-    const res = await fetch(`/${props.user.role}s/${props.user.userId}`, {
+    const res = await fetch(`/${props.user.role}s/${props.user.user_id}`, {
       method: 'PUT',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(values),
     });
     const body = await res.json();
     if (res.status !== 200) {
-      props.enqueueSnackbar(body, {
+      /* props.enqueueSnackbar(body.message, {
         variant: 'error',
-      });
+      });*/
+      alert(JSON.stringify(body));
     } else {
       props.enqueueSnackbar('Saved sucessfully!', {
         variant: 'success',
@@ -94,10 +95,10 @@ const EditStudentProfile = (props) => {
                 <TextField
                   fullWidth
                   label='First name'
-                  name='firstname'
+                  name='first_name'
                   onChange={handleChange}
                   required
-                  value={values.firstname}
+                  value={values.first_name}
                   variant='outlined'
                 />
               </Grid>
@@ -105,10 +106,10 @@ const EditStudentProfile = (props) => {
                 <TextField
                   fullWidth
                   label='Last name'
-                  name='lastname'
+                  name='last_name'
                   onChange={handleChange}
                   required
-                  value={values.lastname}
+                  value={values.last_name}
                   variant='outlined'
                 />
               </Grid>
@@ -136,11 +137,11 @@ const EditStudentProfile = (props) => {
                 <TextField
                   fullWidth
                   label='Student number'
-                  name='studnum'
+                  name='stud_num'
                   onChange={handleChange}
                   type='number'
                   required
-                  value={values.studnum}
+                  value={values.stud_num}
                   variant='outlined'
                 />
               </Grid>

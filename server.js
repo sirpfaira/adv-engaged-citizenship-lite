@@ -26,10 +26,10 @@ app.get('/projects', async (req, res) => {
     if (result.rowCount > 0) {
       res.status(200).json(result.rows);
     } else {
-      res.status(500).json('No data found!');
+      res.status(400).json({ message: 'No featured projects found!' });
     }
   } catch (error) {
-    res.status(500).json('error occured');
+    res.status(500).json({ message: `Error! Couldn't load data from server` });
   }
 });
 
@@ -39,10 +39,10 @@ app.get('/testimonials', async (req, res) => {
     if (result.rowCount > 0) {
       res.status(200).json(result.rows);
     } else {
-      res.status(500).json('No data found!');
+      res.status(400).json({ message: 'No testimonials found!' });
     }
   } catch (error) {
-    res.status(500).json('error occured');
+    res.status(500).json({ message: `Error! Couldn't load data from server` });
   }
 });
 
@@ -52,10 +52,10 @@ app.get('/team', async (req, res) => {
     if (result.rowCount > 0) {
       res.status(200).json(result.rows);
     } else {
-      res.status(500).json('No data found!');
+      res.status(500).json({ message: 'No data found!' });
     }
   } catch (error) {
-    res.status(500).json('error occured');
+    res.status(500).json({ message: `Error! Couldn't load data from server` });
   }
 });
 
@@ -65,10 +65,10 @@ app.get('/students', async (req, res) => {
     if (result.rowCount > 0) {
       res.status(200).json(result.rows);
     } else {
-      res.status(500).json('No data found!');
+      res.status(400).json({ message: 'No students found!' });
     }
   } catch (error) {
-    res.status(500).json('error occured');
+    res.status(500).json({ message: `Error! Couldn't load data from server` });
   }
 });
 
@@ -76,19 +76,19 @@ app.get('/students/:studentId', async function (req, res) {
   const { studentId } = req.params;
   if (studentId) {
     try {
-      const result = await pool.query(
-        `SELECT * FROM students WHERE id = ${Number(studentId)}`
-      );
+      const result = await pool.query(`SELECT * FROM students WHERE id = $1`, [
+        studentId,
+      ]);
       if (result.rowCount > 0) {
         res.status(200).json(result.rows[0]);
       } else {
-        res.status(500).json('No data found!');
+        res.status(400).json({ message: 'No student with such id was found!' });
       }
     } catch (error) {
-      res.status(500).json('error occured');
+      res.status(500).json({ message: error });
     }
   } else {
-    res.status(500).json('error occured');
+    res.status(500).json({ message: `No id was provided` });
   }
 });
 
@@ -103,13 +103,15 @@ app.get('/myprojects/:studentId', async function (req, res) {
       if (result.rowCount > 0) {
         res.status(200).json(result.rows[0]);
       } else {
-        res.status(500).json('No data found!');
+        res.status(400).json({ message: 'No projects found!' });
       }
     } catch (error) {
-      res.status(500).json('error occured');
+      res
+        .status(500)
+        .json({ message: `Error! Couldn't load data from server` });
     }
   } else {
-    res.status(500).json('error occured');
+    res.status(500).json({ message: `Error! Couldn't load data from server` });
   }
 });
 
@@ -120,12 +122,12 @@ app.put('/students/:studentId', async function (req, res) {
     if (stud) {
       try {
         await pool.query(
-          `UPDATE students SET firstname = $1, lastname = $2, gender = $3, studnum = $4, email = $5, phone = $6, state = $7, bio = $8 WHERE id = $9;`,
+          `UPDATE students SET first_name = $1, last_name = $2, gender = $3, stud_num = $4, email = $5, phone = $6, state = $7, bio = $8 WHERE id = $9`,
           [
-            stud.firstname,
-            stud.lastname,
+            stud.first_name,
+            stud.last_name,
             stud.gender,
-            stud.studnum,
+            stud.stud_num,
             stud.email,
             stud.phone,
             stud.state,
@@ -133,15 +135,17 @@ app.put('/students/:studentId', async function (req, res) {
             studentId,
           ]
         );
-        res.status(200).json('Sucess');
+        res.status(200).json('Success');
       } catch (error) {
-        res.status(500).json('An error occured');
+        res.status(500).json({ message: error });
       }
     } else {
-      res.status(500).json('No student information was found in the body!');
+      res
+        .status(500)
+        .json({ message: 'No student information was found in the body!' });
     }
   } else {
-    res.status(500).json('No student id was provided!');
+    res.status(500).json({ message: 'No student id was provided!' });
   }
 });
 
@@ -151,7 +155,8 @@ app.get('/verifystudent', async function (req, res) {
   if (userEmail && userPwd) {
     try {
       const result = await pool.query(
-        `SELECT * FROM students WHERE email = '${userEmail}'`
+        `SELECT * FROM students WHERE email = $1`,
+        [userEmail]
       );
       if (result.rowCount > 0) {
         const student = result.rows[0];
@@ -159,7 +164,8 @@ app.get('/verifystudent', async function (req, res) {
           res.json({
             authorised: true,
             message: 'Success',
-            userId: student.id,
+            user_id: student.id,
+            user_name: `${student.first_name} ${student.last_name}`,
           });
         }
       } else {
@@ -185,20 +191,29 @@ app.get('/verifystudent', async function (req, res) {
   }
 });
 
+app.get('/verifymentor', async function (req, res) {
+  res.status(404).json({ message: `Error! Couldn't load data from server` });
+});
+app.get('/verifyadmin', async function (req, res) {
+  res.status(404).json({ message: `Error! Couldn't load data from server` });
+});
+
 app.get('/notifications/:userId', async function (req, res) {
   const { userId } = req.params;
-  //console.log(`userID: ${userId}`);
   if (userId) {
     try {
       const result = await pool.query(
-        `SELECT * FROM notifications WHERE user_id = ${Number(userId)}`
+        `SELECT * FROM notifications WHERE user_id = $1`,
+        [userId]
       );
       res.status(200).json(result.rows);
     } catch (error) {
-      res.status(500).json('error occured');
+      res.status(400).json({ message: `You dont have any notifications!` });
     }
   } else {
-    res.status(500).json('error occured');
+    res
+      .status(500)
+      .json({ message: `Error! Couldn't load notifications from server` });
   }
 });
 
@@ -207,9 +222,8 @@ app.get('/unreadnotifications/:userId', async function (req, res) {
   if (userId) {
     try {
       const result = await pool.query(
-        `SELECT * FROM notifications WHERE user_id = ${Number(
-          userId
-        )} AND read = false`
+        `SELECT * FROM notifications WHERE user_id = $1 AND read = false`,
+        [userId]
       );
       res.status(200).json({ count: result.rowCount, message: 'Success' });
     } catch (error) {
@@ -225,14 +239,15 @@ app.put('/markallnotificationsread/:userId', async function (req, res) {
   if (userId) {
     try {
       const result = await pool.query(
-        `UPDATE notifications SET read = true WHERE user_id = ${Number(userId)}`
+        `UPDATE notifications SET read = true WHERE user_id = $1`,
+        [userId]
       );
       res.status(200).json(result.rowCount);
     } catch (error) {
-      res.status(500).json('Error occured!');
+      res.status(500).json({ message: 'Error occured!' });
     }
   } else {
-    res.status(500).json('No user id provided');
+    res.status(500).json({ message: 'No user id provided' });
   }
 });
 
@@ -240,15 +255,19 @@ app.delete('/clearallnotifications/:userId', async function (req, res) {
   const { userId } = req.params;
   if (userId) {
     try {
-      await pool.query(
-        `DELETE FROM notifications WHERE user_id = ${Number(userId)}`
-      );
-      res.status(200).json('Sucess');
+      await pool.query(`DELETE FROM notifications WHERE user_id = $1`, [
+        userId,
+      ]);
+      res.status(200).json('Success');
     } catch (error) {
-      res.status(500).json('error occured');
+      res
+        .status(500)
+        .json({ message: `Error! Couldn't delete data on server` });
     }
   } else {
-    res.status(500).json('error occured');
+    res
+      .status(500)
+      .json({ message: `Error! Couldn't delete data from server` });
   }
 });
 

@@ -12,25 +12,33 @@ const Profile = (props) => {
   const [profileInfo, setProfileInfo] = useState({});
   const [projects, setProjects] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(false);
+  const [error, setError] = useState({ state: false, message: '' });
   let history = useHistory();
   const user_role = props.user.role;
 
   useEffect(() => {
     const getProfileInfo = async () => {
-      const res = await fetch(`/${user_role}s/${props.user.userId}`);
+      const res = await fetch(`/${user_role}s/${props.user.user_id}`);
       const body = await res.json();
       if (res.status !== 200) {
-        setError(true);
+        setError({
+          ...error,
+          state: true,
+          message: body.message,
+        });
       } else {
         setProfileInfo(body);
-        setError(false);
+        setError({
+          ...error,
+          state: false,
+          message: '',
+        });
       }
     };
     getProfileInfo();
 
     const getProjects = async () => {
-      const res = await fetch(`/myprojects/${props.user.userId}`);
+      const res = await fetch(`/myprojects/${props.user.user_id}`);
       const body = await res.json();
       if (res.status !== 200) {
       } else {
@@ -52,9 +60,11 @@ const Profile = (props) => {
 
   return (
     <>
-      {loading ?  (
+      {loading ? (
         <Loading />
-      ): error ? (<Error/>) : (
+      ) : error.state ? (
+        <Error message={error.message} />
+      ) : (
         <MainContainer>
           <SubContainer>
             <MediaContainer>
@@ -72,7 +82,7 @@ const Profile = (props) => {
                 <TopContainer>
                   <PhotoContainer>
                     <InitialsAvatar
-                      name={`${profileInfo.firstname} ${profileInfo.lastname}`}
+                      name={`${profileInfo.first_name} ${profileInfo.last_name}`}
                     />
                     <UploadButton />
                   </PhotoContainer>
@@ -97,7 +107,7 @@ const Profile = (props) => {
             <Projects />
           </ProjectsContainer>
         </MainContainer>
-      ) }
+      )}
     </>
   );
 };
@@ -240,7 +250,7 @@ const Info = ({ profileInfo, openEditProfile, role }) => {
       }}
     >
       <Typography gutterBottom variant='h4' sx={{ textAlign: 'center' }}>
-        {`${profileInfo.firstname} ${profileInfo.lastname}`}
+        {`${profileInfo.first_name} ${profileInfo.last_name}`}
       </Typography>
 
       <Typography variant='body1' sx={{ textAlign: 'center' }}>{`Gender:  ${
@@ -256,7 +266,7 @@ const Info = ({ profileInfo, openEditProfile, role }) => {
       <Typography
         variant='body1'
         sx={{ textAlign: 'center' }}
-      >{`Student Number:  ${profileInfo.studnum}`}</Typography>
+      >{`Student Number:  ${profileInfo.stud_num}`}</Typography>
       <Typography
         variant='body1'
         sx={{ textAlign: 'center' }}
@@ -284,49 +294,67 @@ const Summary = () => {
     <Box
       sx={{
         display: 'flex',
-        flexDirection: 'row',
+        flexDirection: 'column',
         justifyContent: 'center',
         alignItems: 'center',
         marginTop: '1.5rem',
       }}
     >
+      <Typography variant='h4'>Activity</Typography>
+      <Divider
+        orientation='horizontal'
+        flexItem
+        width='100%'
+        border-color='primary.grey'
+        sx={{ marginTop: '0.5rem' }}
+      />
       <Box
         sx={{
-          bgcolor: 'primary.frosting_cream',
-          color: 'primary.main',
-          height: '7rem',
-          width: '7rem',
           display: 'flex',
-          flexDirection: 'column',
+          flexDirection: 'row',
           justifyContent: 'center',
           alignItems: 'center',
-          marginRight: '2rem',
-          boxShadow: 3,
+          marginTop: '1.5rem',
         }}
       >
-        <Typography variant='h4'>12</Typography>
-        <Typography variant='body2' sx={{ textAlign: 'center' }}>
-          All Projects Created
-        </Typography>
-      </Box>
+        <Box
+          sx={{
+            bgcolor: 'primary.frosting_cream',
+            color: 'primary.main',
+            height: '7rem',
+            width: '7rem',
+            display: 'flex',
+            flexDirection: 'column',
+            justifyContent: 'center',
+            alignItems: 'center',
+            marginRight: '2rem',
+            boxShadow: 3,
+          }}
+        >
+          <Typography variant='h4'>12</Typography>
+          <Typography variant='body2' sx={{ textAlign: 'center' }}>
+            All Projects Created
+          </Typography>
+        </Box>
 
-      <Box
-        sx={{
-          bgcolor: 'primary.frosting_cream',
-          color: 'primary.main',
-          height: '7rem',
-          width: '7rem',
-          display: 'flex',
-          flexDirection: 'column',
-          justifyContent: 'center',
-          alignItems: 'center',
-          boxShadow: 3,
-        }}
-      >
-        <Typography variant='h4'>3</Typography>
-        <Typography variant='body2' sx={{ textAlign: 'center' }}>
-          Approved Projects
-        </Typography>
+        <Box
+          sx={{
+            bgcolor: 'primary.frosting_cream',
+            color: 'primary.main',
+            height: '7rem',
+            width: '7rem',
+            display: 'flex',
+            flexDirection: 'column',
+            justifyContent: 'center',
+            alignItems: 'center',
+            boxShadow: 3,
+          }}
+        >
+          <Typography variant='h4'>3</Typography>
+          <Typography variant='body2' sx={{ textAlign: 'center' }}>
+            Approved Projects
+          </Typography>
+        </Box>
       </Box>
     </Box>
   );
