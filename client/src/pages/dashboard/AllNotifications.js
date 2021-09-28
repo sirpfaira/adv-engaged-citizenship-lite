@@ -11,11 +11,10 @@ import DialogContent from '@mui/material/DialogContent';
 import DialogContentText from '@mui/material/DialogContentText';
 import DialogTitle from '@mui/material/DialogTitle';
 import styled from 'styled-components';
-import moment from 'moment';
 import { withSnackbar } from 'notistack';
 import Loading from '../../components/Loading';
 import Error from '../../components/Error';
-//import USER_NOTIFICATIONS from '../../assets/data/userNotifications';
+import { elapsedTimeStr } from '../../services/utils';
 
 function AllNotifications(props) {
   if (props.user.user_id) {
@@ -33,7 +32,6 @@ function AllNotifications(props) {
     props.history.push('/');
   }
 
-  const [refresh, setRefresh] = useState(false);
   const [myNotifications, setMyNotifications] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState({ state: false, message: '' });
@@ -95,6 +93,47 @@ function AllNotifications(props) {
     handleClose();
   };
 
+  const handleDeleteOne = async (event) => {
+    event.preventDefault();
+    const notificationId = event.currentTarget.getAttribute('data-id');
+    if (notificationId) {
+      const res = await fetch(`/deleteonenotification`, {
+        method: 'DELETE',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          user_id: props.user.user_id,
+          notification_id: notificationId,
+        }),
+      });
+      const body = await res.json();
+      if (res.status !== 200) {
+        props.enqueueSnackbar(body.message, {
+          variant: `Fatal error! Couldn't delete`,
+        });
+      } else {
+        props.enqueueSnackbar('Notification was deleted!', {
+          variant: 'success',
+        });
+        const newArr = myNotifications.filter(
+          (notification) => notification.id !== notificationId
+        );
+        setMyNotifications(newArr);
+      }
+    } else {
+    }
+  };
+
+  const handleOpenProject = (event) => {
+    event.preventDefault();
+    const projectTitle = event.currentTarget.getAttribute('data-id');
+    props.history.push({
+      pathname: '/viewproject',
+      state: {
+        project_id: projectTitle,
+      },
+    });
+  };
+
   return (
     <Container
       sx={{
@@ -144,7 +183,12 @@ function AllNotifications(props) {
           <Box>
             {myNotifications.length > 0 ? (
               myNotifications.map((notification, index) => (
-                <NotificationCard notification={notification} key={index} />
+                <NotificationCard
+                  notification={notification}
+                  key={index}
+                  handleDeleteOne={handleDeleteOne}
+                  handleOpenProject={handleOpenProject}
+                />
               ))
             ) : (
               <Typography sx={{ fontStyle: 'italic' }}>
@@ -178,31 +222,11 @@ function AllNotifications(props) {
   );
 }
 
-const NotificationCard = ({ notification, handleDeleteOne }) => {
-  const getElapsedTime = (timestamp) => {
-    var given = moment(timestamp, 'YYYY-MM-DD HH:mm');
-    var current = moment();
-    const minutes = Math.floor(
-      moment.duration(current.diff(given)).asMinutes()
-    );
-    //console.log(minutes);
-    if (minutes > 518400) {
-      const years = Math.floor(minutes / 518400);
-      return `${years} ${years === 1 ? ` year ago` : ` years ago`}`;
-    } else if (minutes > 43200) {
-      const months = Math.floor(minutes / 43200);
-      return `${months} ${months === 1 ? ` month ago` : ` months ago`}`;
-    } else if (minutes > 1440) {
-      const days = Math.floor(minutes / 1440);
-      return `${days} ${days === 1 ? ` day ago` : ` days ago`}`;
-    } else if (minutes > 60) {
-      const hrs = Math.floor(minutes / 60);
-      return `${hrs} ${hrs === 1 ? ` hr ago` : ` hrs ago`}`;
-    } else {
-      return `${minutes} ${minutes === 1 ? ` min ago` : ` mins ago`}`;
-    }
-  };
-
+const NotificationCard = ({
+  notification,
+  handleDeleteOne,
+  handleOpenProject,
+}) => {
   return (
     <Card sx={{ minWidth: '90%', marginBottom: '2rem' }}>
       <CardContent>
@@ -219,7 +243,7 @@ const NotificationCard = ({ notification, handleDeleteOne }) => {
             {notification.title}
           </Typography>
           <Typography variant='body2' component='div' color='primary.green'>
-            {getElapsedTime(notification.timestamp)}
+            {elapsedTimeStr(notification.timestamp, true)}
           </Typography>
         </Box>
         <Typography variant='body1' component='div'>
@@ -228,6 +252,15 @@ const NotificationCard = ({ notification, handleDeleteOne }) => {
       </CardContent>
       <CardActions>
         <Button
+          data-id={notification.project_id}
+          size='small'
+          startIcon={<DeleteIcon />}
+          onClick={handleOpenProject}
+        >
+          View Project
+        </Button>
+        <Button
+          data-id={notification.id}
           size='small'
           startIcon={<DeleteIcon />}
           onClick={handleDeleteOne}

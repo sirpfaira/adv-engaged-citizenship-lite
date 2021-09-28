@@ -3,8 +3,8 @@ const app = express();
 app.use(express.json());
 
 app.use(express.urlencoded({ extended: false }));
-const cors = require('cors');
-app.use(cors({ origin: true, methods: ['GET', 'POST'], credentials: true }));
+//const cors = require('cors');
+//app.use(cors({ origin: true, methods: ['GET', 'POST'], credentials: true }));
 const { Pool } = require('pg');
 require('dotenv').config();
 
@@ -52,7 +52,7 @@ app.get('/team', async (req, res) => {
     if (result.rowCount > 0) {
       res.status(200).json(result.rows);
     } else {
-      res.status(500).json({ message: 'No data found!' });
+      res.status(400).json({ message: 'No data found!' });
     }
   } catch (error) {
     res.status(500).json({ message: `Error! Couldn't load data from server` });
@@ -97,21 +97,55 @@ app.get('/myprojects/:studentId', async function (req, res) {
   if (studentId) {
     try {
       const result = await pool.query(
-        `SELECT * FROM projects where $1 = ANY(owners)`,
+        `SELECT * FROM projects WHERE owner = $1`,
         [studentId]
       );
       if (result.rowCount > 0) {
-        res.status(200).json(result.rows[0]);
+        res.status(200).json(result.rows);
       } else {
         res.status(400).json({ message: 'No projects found!' });
       }
     } catch (error) {
-      res
-        .status(500)
-        .json({ message: `Error! Couldn't load data from server` });
+      res.status(500).json({ message: error });
     }
   } else {
-    res.status(500).json({ message: `Error! Couldn't load data from server` });
+    res.status(500).json({ message: `No user ID was provided` });
+  }
+});
+
+app.post('/createproject/:studentId', async function (req, res) {
+  const { studentId } = req.params;
+  const project = req.body;
+  if (studentId) {
+    if (project) {
+      try {
+        const queryResults = await pool.query(
+          `INSERT INTO projects (owner, title, problem, solution, img, date, collaborators, sdgs, featured) VALUES($1, $2, $3, $4, $5, $6, $7, $8, $9) RETURNING id`,
+          [
+            studentId,
+            project.title,
+            project.problem,
+            project.solution,
+            project.img,
+            project.date,
+            project.collaborators,
+            project.sdgs,
+            project.featured,
+          ]
+        );
+        res
+          .status(200)
+          .json({ message: 'Success', entry_id: queryResults?.rows[0]?.id });
+      } catch (error) {
+        res
+          .status(500)
+          .json({ message: `Couldn't save project on database! Try again!` });
+      }
+    }
+  } else {
+    res
+      .status(500)
+      .json({ message: `Couldn't save project on database! Try again!` });
   }
 });
 
@@ -146,6 +180,27 @@ app.put('/students/:studentId', async function (req, res) {
     }
   } else {
     res.status(500).json({ message: 'No student id was provided!' });
+  }
+});
+
+app.put('/changepassword', async function (req, res) {
+  const { user_id, new_password } = req.body;
+  if (user_id && new_password) {
+    try {
+      await pool.query(`UPDATE students SET password = $1 WHERE id = $2`, [
+        new_password,
+        user_id,
+      ]);
+      res.status(200).json({ message: 'Success' });
+    } catch (error) {
+      res
+        .status(500)
+        .json({ message: `Fatal error! Couldn't change password!` });
+    }
+  } else {
+    res
+      .status(500)
+      .json({ message: `No data fields were provided with the request` });
   }
 });
 
@@ -196,6 +251,30 @@ app.get('/verifymentor', async function (req, res) {
 });
 app.get('/verifyadmin', async function (req, res) {
   res.status(404).json({ message: `Error! Couldn't load data from server` });
+});
+
+app.post('/createnotification', async function (req, res) {
+  const notification = req.body;
+  if (notification) {
+    try {
+      const queryResults = await pool.query(
+        `INSERT INTO notifications (user_id, project_id, title, message, timestamp, read) VALUES ($1, $2, $3, $4, $5, $6)`,
+        [
+          notification.user_id,
+          notification.project_id,
+          notification.title,
+          notification.message,
+          notification.timestamp,
+          notification.read,
+        ]
+      );
+      res.status(200).json({ message: 'Success' });
+    } catch (error) {
+      res.status(500).json({
+        message: `Couldn't save notification on database! Try again!`,
+      });
+    }
+  }
 });
 
 app.get('/notifications/:userId', async function (req, res) {
@@ -271,20 +350,35 @@ app.delete('/clearallnotifications/:userId', async function (req, res) {
   }
 });
 
-app.get('/', (req, res) => {
-  res
-    .status(200)
-    .json('You have hit the Advancing Engaged Citizenship server!');
+app.delete('/deleteonenotification', async function (req, res) {
+  const { user_id, notification_id } = req.body;
+  if (user_id && notification_id) {
+    try {
+      await pool.query(
+        `DELETE FROM notifications WHERE id = $1 AND user_id = $2`,
+        [notification_id, user_id]
+      );
+      res.status(200).json('Success');
+    } catch (error) {
+      res
+        .status(500)
+        .json({ message: `Error! Couldn't delete data on server` });
+    }
+  } else {
+    res
+      .status(500)
+      .json({ message: `Error! Couldn't delete notification from server` });
+  }
 });
 
-app.post('/', (req, res) => {
-  //console.log(req.body);
-  res
-    .status(200)
-    .send(
-      `I received your POST request. This is what you sent me: ${req.body.post}`
-    );
-});
+if (process.env.NODE_ENV === 'production') {
+  // set static folder to let our Express server know to serve our React project
+  app.use(express.static('client/build'));
+  //This piece of code is to keep our client side routing functional. This code essentially serves the index.html file on any unknown routes.
+  app.get('*', (req, res) => {
+    res.sendFile(path.resolve(__dirname, 'client', 'build', 'index.html'));
+  });
+}
 
 const port = process.env.PORT || 5000;
 app.listen(port, () => console.log(`Listening on port ${port}`));

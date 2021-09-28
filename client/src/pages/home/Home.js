@@ -7,6 +7,7 @@ import Loading from '../../components/Loading';
 //import Settings from '../dashboard/Settings';
 //import theme from '../../themes/theme';
 import HEADERS_DATA from '../../components/headers_data';
+import CreateProject from '../dashboard/CreateProject';
 
 const Home = (props) => {
   const [data, setData] = useState({
@@ -65,6 +66,8 @@ const Home = (props) => {
       <Footer />
     </MainContainer>
   );
+
+  /*return <CreateProject />;*/
 };
 
 export default Home;

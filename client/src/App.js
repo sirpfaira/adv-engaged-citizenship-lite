@@ -11,7 +11,10 @@ import EditProfile from './pages/dashboard/EditProfile';
 import HEADERS_DATA from './components/headers_data';
 import ImageUpload from './pages/dashboard/ImageUpload';
 import Settings from './pages/dashboard/Settings';
-import moment from 'moment';
+import { elapsedTimeStr } from './services/utils';
+import CreateProject from './pages/dashboard/CreateProject';
+import ViewProject from './pages/dashboard/ViewProject';
+import MyProjects from './pages/dashboard/MyProjects';
 
 function App(props) {
   const [user, setUser] = useState({
@@ -31,16 +34,9 @@ function App(props) {
 
   useEffect(() => {
     let localUserData = localStorage.getItem('user');
-    //console.log(`userProfile=${localUserData}`);
-    //console.log(`userProfile=${localUserData.user_name}`);
     if (localUserData) {
       let userProfile = JSON.parse(localUserData);
-      var last_login_date = moment(userProfile.last_login, 'YYYY-MM-DD HH:mm');
-      var current = moment();
-      const minutes = Math.floor(
-        moment.duration(current.diff(last_login_date)).asMinutes()
-      );
-      //console.log(minutes);
+      const minutes = elapsedTimeStr(userProfile.last_login, false);
       if (minutes > 720) {
         changeUser({
           auth: false,
@@ -52,7 +48,6 @@ function App(props) {
         localStorage.removeItem('user');
       } else {
         changeUser(userProfile);
-        //console.log(`userProfile2=${userProfile}`);
       }
     }
   }, []);
@@ -114,6 +109,36 @@ function App(props) {
             render={(props) =>
               user.auth ? (
                 <AllNotifications {...props} user={user} />
+              ) : (
+                <Redirect to='/login' />
+              )
+            }
+          />
+          <Route
+            path='/createproject'
+            render={(props) =>
+              user.auth ? (
+                <CreateProject {...props} user={user} />
+              ) : (
+                <Redirect to='/login' />
+              )
+            }
+          />
+          <Route
+            path='/myprojects'
+            render={(props) =>
+              user.auth ? (
+                <MyProjects {...props} user={user} />
+              ) : (
+                <Redirect to='/login' />
+              )
+            }
+          />
+          <Route
+            path='/viewproject'
+            render={(props) =>
+              user.auth ? (
+                <ViewProject {...props} user={user} />
               ) : (
                 <Redirect to='/login' />
               )

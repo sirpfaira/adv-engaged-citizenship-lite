@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import styled from 'styled-components';
 import {
   Box,
@@ -11,14 +11,13 @@ import {
   Checkbox,
 } from '@mui/material';
 import SendIcon from '@mui/icons-material/Send';
-//import CancelIcon from '@mui/icons-material/Cancel';
+import { withSnackbar } from 'notistack';
 
 const Settings = (props) => {
   const [values, setValues] = useState({
     oldpwd: '',
     newpwd: '',
     newpwd2: '',
-    password: '',
     sms: true,
     phone: false,
     email: true,
@@ -38,7 +37,48 @@ const Settings = (props) => {
     });
   };
 
-  const savePassword = () => {};
+  const savePassword = async () => {
+    if (values.oldpwd && values.newpwd && values.newpwd2) {
+      if (values.newpwd === values.newpwd2) {
+        const res = await fetch(`/students/${props.user.user_id}`);
+        const body = await res.json();
+        if (res.status !== 200) {
+          props.enqueueSnackbar(body.message, {
+            variant: 'error',
+          });
+        } else {
+          if (body.password === values.oldpwd) {
+            const res = await fetch(`/changepassword`, {
+              method: 'PUT',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({
+                user_id: props.user.user_id,
+                new_password: values.newpwd,
+              }),
+            });
+            const body = await res.json();
+            if (res.status !== 200) {
+              props.enqueueSnackbar(body.message, {
+                variant: 'error',
+              });
+            } else {
+              props.enqueueSnackbar('Password was sucessfully changed!', {
+                variant: 'success',
+              });
+            }
+          } else {
+            props.enqueueSnackbar('Please provide all fields!', {
+              variant: 'error',
+            });
+          }
+        }
+      } else {
+        props.enqueueSnackbar('New password mismatch!', { variant: 'error' });
+      }
+    } else {
+      props.enqueueSnackbar('Please provide all fields!', { variant: 'error' });
+    }
+  };
   const saveCommPrefs = () => {};
   return (
     <MainContainer>
@@ -60,7 +100,7 @@ const Settings = (props) => {
   );
 };
 
-export default Settings;
+export default withSnackbar(Settings);
 
 const PasswordContainer = styled.div`
   margin-top: 1rem;

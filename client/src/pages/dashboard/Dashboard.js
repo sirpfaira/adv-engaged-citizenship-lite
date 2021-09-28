@@ -25,6 +25,9 @@ function Dashboard(props) {
         <h1>{`WELCOME ${props.user.role} - ${props.user.user_name}!`}</h1>
         <h2>DASHBOARD</h2>
         <button>Log out</button>
+        <button onClick={() => props.history.push('/createproject')}>
+          New Project
+        </button>
       </div>
     </div>
   );

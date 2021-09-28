@@ -7,11 +7,14 @@ import { useHistory } from 'react-router-dom';
 import AddAPhotoIcon from '@mui/icons-material/AddAPhoto';
 import Loading from '../../components/Loading';
 import Error from '../../components/Error';
+import { pascalCase } from '../../services/utils';
 
 const Profile = (props) => {
   const [profileInfo, setProfileInfo] = useState({});
   const [projects, setProjects] = useState([]);
+  const [projectsId, setProjectsId] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [refresh, setRefresh] = useState(false);
   const [error, setError] = useState({ state: false, message: '' });
   let history = useHistory();
   const user_role = props.user.role;
@@ -34,26 +37,43 @@ const Profile = (props) => {
           message: '',
         });
       }
+      //setLoading(false);
     };
     getProfileInfo();
 
     const getProjects = async () => {
       const res = await fetch(`/myprojects/${props.user.user_id}`);
       const body = await res.json();
+      console.log(JSON.stringify(body));
       if (res.status !== 200) {
       } else {
-        setProjects(body);
+        const newArr = body.map((el) => el.title);
+        const newArr2 = body.map((el) => el.id);
+        setProjects(newArr);
+        setProjectsId(newArr2);
       }
       setLoading(false);
     };
     getProjects();
-  }, []);
+  }, [refresh]);
 
   const openEditProfile = () => {
     history.push({
       pathname: '/editprofile',
       state: {
         data: profileInfo,
+      },
+    });
+  };
+
+  const handleProjectView = (event) => {
+    event.preventDefault();
+    const projectTitle = event.currentTarget.getAttribute('data-id');
+    //alert(projectTitle);
+    history.push({
+      pathname: '/viewproject',
+      state: {
+        project_id: projectTitle,
       },
     });
   };
@@ -84,7 +104,6 @@ const Profile = (props) => {
                     <InitialsAvatar
                       name={`${profileInfo.first_name} ${profileInfo.last_name}`}
                     />
-                    <UploadButton />
                   </PhotoContainer>
                   <InfoContainer>
                     <Info
@@ -99,12 +118,16 @@ const Profile = (props) => {
             <BioContainer>
               <Box sx={{ boxShadow: 3, padding: '1rem' }}>
                 <Bio bio={profileInfo.bio} />
-                <Summary />
+                <Summary count={projects.length} />
               </Box>
             </BioContainer>
           </SubContainer>
           <ProjectsContainer>
-            <Projects />
+            <Projects
+              projects={projects}
+              handleProjectView={handleProjectView}
+              projectsId={projectsId}
+            />
           </ProjectsContainer>
         </MainContainer>
       )}
@@ -168,7 +191,6 @@ const TopContainer = styled.div`
   width: 100%;
 
   @media (min-width: 768px) {
-    flex-direction: row;
     margin-left: 1rem;
     margin-right: 1rem;
   }
@@ -178,16 +200,15 @@ const PhotoContainer = styled.div`
   flex-direction: column;
   align-items: center;
   width: 100%;
-  @media (min-width: 768px) {
-    width: 40%;
-  }
 `;
 const InfoContainer = styled.div`
+  display: flex;
+  flex-direction: column;
+  align-items: center;
   width: 100%;
   @media (min-width: 768px) {
     margin-left: 1rem;
     margin-right: 1rem;
-    width: 60%;
   }
 `;
 const BioContainer = styled.div`
@@ -211,8 +232,9 @@ const ProjectsContainer = styled.div`
   }
 `;
 
-const Projects = () => {
-  const array = ['Star wars', 'Despicable me'];
+const Projects = ({ projects, handleProjectView, projectsId }) => {
+  //const array = ['Star wars', 'Despicable me'];
+
   return (
     <Box sx={{ width: '100%', boxShadow: 3, padding: '1rem' }}>
       <Typography variant='h5' sx={{ textAlign: 'center' }}>
@@ -225,8 +247,16 @@ const Projects = () => {
         border-color='primary.grey'
         sx={{ marginBottom: '1rem' }}
       />
-      {array.length > 0 ? (
-        array.map((title, index) => <ProjectTile title={title} key={index} />)
+      {projects.length > 0 ? (
+        projects.map((title, index) => (
+          <ProjectTile
+            title={title}
+            key={index}
+            handleProjectView={handleProjectView}
+            projects={projects}
+            projectsId={projectsId}
+          />
+        ))
       ) : (
         <Typography
           variant='body2'
@@ -253,12 +283,14 @@ const Info = ({ profileInfo, openEditProfile, role }) => {
         {`${profileInfo.first_name} ${profileInfo.last_name}`}
       </Typography>
 
-      <Typography variant='body1' sx={{ textAlign: 'center' }}>{`Gender:  ${
-        profileInfo.gender.charAt(0).toUpperCase() + profileInfo.gender.slice(1)
-      }`}</Typography>
-      <Typography variant='body1' sx={{ textAlign: 'center' }}>{`Role:  ${
-        role.charAt(0).toUpperCase() + role.slice(1)
-      }`}</Typography>
+      <Typography
+        variant='body1'
+        sx={{ textAlign: 'center' }}
+      >{`Gender:  ${pascalCase(profileInfo.gender)}`}</Typography>
+      <Typography
+        variant='body1'
+        sx={{ textAlign: 'center' }}
+      >{`Role:  ${pascalCase(role)}`}</Typography>
       <Typography
         variant='body1'
         sx={{ textAlign: 'center' }}
@@ -274,22 +306,35 @@ const Info = ({ profileInfo, openEditProfile, role }) => {
       <Typography
         variant='body1'
         sx={{ marginBottom: '0.7rem' }}
-      >{`Province:  ${(
-        profileInfo.state.charAt(0).toUpperCase() + profileInfo.state.slice(1)
-      ).replace('-', ' ')}`}</Typography>
-      <Button
-        variant='outlined'
-        startIcon={<EditIcon />}
-        sx={{ textTransform: 'none' }}
-        onClick={openEditProfile}
+      >{`Province:  ${pascalCase(profileInfo.state).replace(
+        '-',
+        ' '
+      )}`}</Typography>
+
+      <Box
+        sx={{
+          display: 'flex',
+          flexDirection: 'row',
+          alignItems: 'center',
+          padding: '1rem',
+          width: '100%',
+        }}
       >
-        Edit profile
-      </Button>
+        <UploadButton />
+        <Button
+          variant='outlined'
+          startIcon={<EditIcon />}
+          sx={{ textTransform: 'none', marginLeft: '1rem' }}
+          onClick={openEditProfile}
+        >
+          Edit profile
+        </Button>
+      </Box>
     </Box>
   );
 };
 
-const Summary = () => {
+const Summary = ({ count }) => {
   return (
     <Box
       sx={{
@@ -321,8 +366,8 @@ const Summary = () => {
           sx={{
             bgcolor: 'primary.frosting_cream',
             color: 'primary.main',
-            height: '7rem',
-            width: '7rem',
+            height: '6.5rem',
+            width: '6.5rem',
             display: 'flex',
             flexDirection: 'column',
             justifyContent: 'center',
@@ -331,9 +376,9 @@ const Summary = () => {
             boxShadow: 3,
           }}
         >
-          <Typography variant='h4'>12</Typography>
+          <Typography variant='h4'>{count}</Typography>
           <Typography variant='body2' sx={{ textAlign: 'center' }}>
-            All Projects Created
+            Projects Created
           </Typography>
         </Box>
 
@@ -341,8 +386,8 @@ const Summary = () => {
           sx={{
             bgcolor: 'primary.frosting_cream',
             color: 'primary.main',
-            height: '7rem',
-            width: '7rem',
+            height: '6.5rem',
+            width: '6.5rem',
             display: 'flex',
             flexDirection: 'column',
             justifyContent: 'center',
@@ -350,9 +395,9 @@ const Summary = () => {
             boxShadow: 3,
           }}
         >
-          <Typography variant='h4'>3</Typography>
+          <Typography variant='h4'>0</Typography>
           <Typography variant='body2' sx={{ textAlign: 'center' }}>
-            Approved Projects
+            Projects Approved
           </Typography>
         </Box>
       </Box>
@@ -405,7 +450,7 @@ const InitialsAvatar = ({ name }) => {
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'center',
-        height: '8rem',
+        height: '10rem',
         width: '8rem',
         borderRadius: '10%',
         marginBottom: '1rem',
@@ -443,14 +488,14 @@ const UploadButton = () => {
           sx={{ textTransform: 'none' }}
           component='span'
         >
-          <AddAPhotoIcon sx={{ marginRight: '0.5rem' }} /> Upload
+          <AddAPhotoIcon sx={{ marginRight: '0.5rem' }} /> Upload photo
         </Button>
       </label>
     </Box>
   );
 };
 
-const ProjectTile = ({ title }) => {
+const ProjectTile = ({ title, handleProjectView, projects, projectsId }) => {
   return (
     <Box
       sx={{
@@ -464,7 +509,10 @@ const ProjectTile = ({ title }) => {
       }}
     >
       <Typography>{title}</Typography>
-      <ViewButton>
+      <ViewButton
+        data-id={projectsId[projects.indexOf(title)]}
+        onClick={handleProjectView}
+      >
         <Typography variant='body2' sx={{ marginRight: '0.4rem' }}>
           View
         </Typography>

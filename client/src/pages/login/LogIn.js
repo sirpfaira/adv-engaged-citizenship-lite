@@ -14,6 +14,7 @@ import Typography from '@mui/material/Typography';
 import Container from '@mui/material/Container';
 import { withSnackbar } from 'notistack';
 import moment from 'moment';
+import { elapsedTimeStr, pascalCase } from '../../services/utils';
 
 const LogIn = (props) => {
   const [values, setValues] = useState({
@@ -27,16 +28,9 @@ const LogIn = (props) => {
 
   useEffect(() => {
     let localUserData = localStorage.getItem('user');
-    //console.log(`userProfile=${localUserData}`);
-    //console.log(`userProfile=${localUserData.user_name}`);
     if (localUserData) {
       let userProfile = JSON.parse(localUserData);
-      var last_login_date = moment(userProfile.last_login, 'YYYY-MM-DD HH:mm');
-      var current = moment();
-      const minutes = Math.floor(
-        moment.duration(current.diff(last_login_date)).asMinutes()
-      );
-      //console.log(minutes);
+      const minutes = elapsedTimeStr(userProfile.last_login, false);
       if (minutes > 720) {
         props.changeUser({
           auth: false,
@@ -74,10 +68,7 @@ const LogIn = (props) => {
     );
 
     if (aunthenticated) {
-      //console.log(`Values: ${JSON.stringify(values)}`);
-
       handleModalClose();
-      //props.changeHeaders(HEADERS_DATA[values.role]);
       props.history.push('/dashboard');
     } else {
       handleModalClose();
@@ -166,11 +157,7 @@ const LogIn = (props) => {
             <LockOutlinedIcon />
           </Avatar>
           <Typography component='h1' variant='h5'>
-            {`${values.role
-              .replace('?', '')
-              .replace(/(\w)(\w*)/g, function (g0, g1, g2) {
-                return g1.toUpperCase() + g2.toLowerCase();
-              })} Log In`}
+            {`${pascalCase(values.role)} Log In`}
           </Typography>
           <Box
             component='form'

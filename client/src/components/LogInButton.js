@@ -1,4 +1,4 @@
-import React from 'react';
+import { useState } from 'react';
 import { Button, Typography } from '@mui/material';
 import Menu from '@mui/material/Menu';
 import MenuItem from '@mui/material/MenuItem';
@@ -10,7 +10,7 @@ import { withSnackbar } from 'notistack';
 import HEADERS_DATA from '../components/headers_data';
 
 function LogInButton(props) {
-  const [anchorEl, setAnchorEl] = React.useState(null);
+  const [anchorEl, setAnchorEl] = useState(null);
   const open = Boolean(anchorEl);
   const handleClick = (event) => {
     if (props.user.auth) {
@@ -87,7 +87,7 @@ function LogInButton(props) {
       >
         <MenuItem
           onClick={() => {
-            props.history.push('/login?student');
+            props.history.push('/login');
             handleClose();
             props.changeUser({
               auth: false,
