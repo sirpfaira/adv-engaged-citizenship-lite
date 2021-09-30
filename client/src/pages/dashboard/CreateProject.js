@@ -91,7 +91,6 @@ const CreateProject = (props) => {
           variant: 'error',
         });
       } else {
-        //handleClickOpen();  successMessage
         const newNotification = {
           user_id: props.user.user_id,
           project_id: body.entry_id,
@@ -105,6 +104,7 @@ const CreateProject = (props) => {
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify(newNotification),
         });
+        handleClickOpen();
       }
     } else {
       props.enqueueSnackbar('Please provide all fields', { variant: 'error' });

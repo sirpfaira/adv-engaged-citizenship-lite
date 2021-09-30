@@ -33,7 +33,7 @@ export default function ProjectCard({ project }) {
         </Typography>
 
         <Typography variant='body2' sx={{ padding: '0.7rem' }}>
-          {truncateStr(project.problem + project.solutrion, 300)}
+          {truncateStr(project.problem + project.solution, 300)}
         </Typography>
         <Box
           sx={{
